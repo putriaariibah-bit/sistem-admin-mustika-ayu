@@ -37,11 +37,16 @@ class DashboardScreen extends StatelessWidget {
   /// Callback ketika tombol "Tambah Pesanan" ditekan.
   final VoidCallback? onTambah;
 
+  /// Callback ketika tombol Keluar di app bar ditekan (ponsel).
+  /// Jika null, tombol disembunyikan.
+  final VoidCallback? onKeluar;
+
   const DashboardScreen({
     super.key,
     this.onLihatSemua,
     this.onPesananTap,
     this.onTambah,
+    this.onKeluar,
   });
 
   @override
@@ -99,7 +104,20 @@ class DashboardScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: lebar ? null : AppBar(title: const Text('Dashboard')),
+      appBar: lebar
+          ? null
+          : AppBar(
+              title: const Text('Dashboard'),
+              actions: [
+                if (onKeluar != null)
+                  IconButton(
+                    key: const Key('tombol-keluar'),
+                    tooltip: 'Keluar',
+                    icon: const Icon(Icons.logout),
+                    onPressed: onKeluar,
+                  ),
+              ],
+            ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(

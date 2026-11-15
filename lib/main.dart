@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
 import 'models/pesanan_model.dart';
+import 'screens/cek_status_login.dart';
 import 'screens/daftar_pesanan_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/detail_pesanan_screen.dart';
@@ -21,9 +22,16 @@ Future<void> main() async {
 /// Root widget aplikasi KelolaKatering.
 ///
 /// Menggunakan [AppTheme.light] sebagai tema Material 3
-/// dan [HomeShell] sebagai halaman awal.
+/// dan [CekStatusLogin] sebagai halaman awal.
 class KelolaKateringApp extends StatelessWidget {
-  const KelolaKateringApp({super.key});
+  /// Halaman pertama aplikasi. Bawaannya [CekStatusLogin]; pengujian
+  /// widget memakai [HomeShell] agar tidak memanggil Firebase.
+  final Widget halamanAwal;
+
+  const KelolaKateringApp({
+    super.key,
+    this.halamanAwal = const CekStatusLogin(),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +39,7 @@ class KelolaKateringApp extends StatelessWidget {
       title: 'KelolaKatering',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const HomeShell(),
+      home: halamanAwal,
     );
   }
 }
@@ -46,7 +54,10 @@ class KelolaKateringApp extends StatelessWidget {
 /// Index 0 = Dashboard, Index 1 = Daftar Pesanan. [IndexedStack] menjaga
 /// state tiap tab (mis. kata pencarian) saat berpindah tab.
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  /// Dipanggil saat pemilik menekan Keluar. Jika null, tombol disembunyikan.
+  final VoidCallback? onKeluar;
+
+  const HomeShell({super.key, this.onKeluar});
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -109,6 +120,7 @@ class _HomeShellState extends State<HomeShell> {
           onLihatSemua: () => _pilihTab(1),
           onPesananTap: _bukaDetailPesanan,
           onTambah: _bukaFormTambah,
+          onKeluar: widget.onKeluar,
         ),
         DaftarPesananScreen(
           onPesananTap: _bukaDetailPesanan,
@@ -124,6 +136,7 @@ class _HomeShellState extends State<HomeShell> {
             SidebarMenu(
               indeksAktif: _currentIndex,
               onPilih: _pilihTab,
+              onKeluar: widget.onKeluar,
             ),
             Expanded(child: halaman),
           ],

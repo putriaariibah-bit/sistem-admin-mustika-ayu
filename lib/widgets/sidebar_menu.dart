@@ -14,10 +14,14 @@ class SidebarMenu extends StatelessWidget {
   /// Dipanggil dengan index menu yang dipilih.
   final ValueChanged<int> onPilih;
 
+  /// Dipanggil saat menu Keluar ditekan. Jika null, menu disembunyikan.
+  final VoidCallback? onKeluar;
+
   const SidebarMenu({
     super.key,
     required this.indeksAktif,
     required this.onPilih,
+    this.onKeluar,
   });
 
   @override
@@ -66,6 +70,16 @@ class SidebarMenu extends StatelessWidget {
                 aktif: indeksAktif == 1,
                 onTap: () => onPilih(1),
               ),
+              if (onKeluar != null) ...[
+                const Spacer(),
+                _ItemMenu(
+                  key: const Key('tombol-keluar'),
+                  ikon: Icons.logout,
+                  label: 'Keluar',
+                  aktif: false,
+                  onTap: onKeluar!,
+                ),
+              ],
             ],
           ),
         ),
