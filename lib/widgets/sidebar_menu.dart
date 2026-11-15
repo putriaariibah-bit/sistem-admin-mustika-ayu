@@ -47,7 +47,7 @@ class SidebarMenu extends StatelessWidget {
                   AppTheme.spacing24,
                 ),
                 child: Text(
-                  'KelolaKatering',
+                  'Mustika Ayu Catering',
                   style: TextStyle(
                     fontSize: AppTheme.subjudul,
                     fontWeight: FontWeight.w700,

@@ -1,53 +1,28 @@
 import 'package:flutter/material.dart';
 
-import '../models/pesanan_model.dart';
+import '../models/pesanan.dart';
 import '../utils/theme.dart';
 
-/// Badge yang menampilkan status pesanan atau status pembayaran.
+/// Badge status pembayaran: Belum bayar, DP, atau Lunas.
 ///
-/// Bentuknya kapsul bergaris dengan latar muda, sesuai bagian
-/// "Status Pesanan & Pembayaran" pada style guide Figma. Status
-/// selalu disertai teks, jadi tidak disampaikan hanya lewat warna.
-///
-/// Gunakan factory constructor:
-/// - [StatusBadge.pesanan] untuk status pesanan.
-/// - [StatusBadge.pembayaran] untuk status pembayaran.
+/// Bentuknya kapsul bergaris dengan latar muda sesuai style guide Figma.
+/// Status selalu disertai teks, jadi tidak disampaikan hanya lewat warna.
 class StatusBadge extends StatelessWidget {
-  /// Label teks yang ditampilkan di dalam badge.
-  final String label;
+  final StatusPembayaran status;
 
-  /// Warna teks dan garis badge.
-  final Color color;
+  const StatusBadge(this.status, {super.key});
 
-  /// Warna latar badge.
-  final Color backgroundColor;
+  Color get _warna => switch (status) {
+        StatusPembayaran.belumBayar => AppTheme.bayarBelum,
+        StatusPembayaran.dp => AppTheme.bayarDP,
+        StatusPembayaran.lunas => AppTheme.bayarLunas,
+      };
 
-  const StatusBadge._({
-    super.key,
-    required this.label,
-    required this.color,
-    required this.backgroundColor,
-  });
-
-  /// Membuat badge untuk [StatusPesanan].
-  factory StatusBadge.pesanan(StatusPesanan status, {Key? key}) {
-    return StatusBadge._(
-      key: key,
-      label: status.label,
-      color: status.color,
-      backgroundColor: status.lightColor,
-    );
-  }
-
-  /// Membuat badge untuk [StatusPembayaran].
-  factory StatusBadge.pembayaran(StatusPembayaran status, {Key? key}) {
-    return StatusBadge._(
-      key: key,
-      label: status.label,
-      color: status.color,
-      backgroundColor: status.lightColor,
-    );
-  }
+  Color get _latar => switch (status) {
+        StatusPembayaran.belumBayar => AppTheme.bayarBelumLatar,
+        StatusPembayaran.dp => AppTheme.bayarDPLatar,
+        StatusPembayaran.lunas => AppTheme.bayarLunasLatar,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +32,16 @@ class StatusBadge extends StatelessWidget {
         vertical: 3,
       ),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: _latar,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color, width: 1),
+        border: Border.all(color: _warna),
       ),
       child: Text(
-        label,
+        status.label,
         style: TextStyle(
           fontSize: AppTheme.keterangan,
           fontWeight: FontWeight.w600,
-          color: color,
+          color: _warna,
         ),
       ),
     );

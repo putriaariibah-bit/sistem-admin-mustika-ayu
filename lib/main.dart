@@ -1,14 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'data/repositori.dart';
 import 'firebase_options.dart';
-import 'models/pesanan_model.dart';
+import 'models/pesanan.dart';
 import 'screens/cek_status_login.dart';
 import 'screens/daftar_pesanan_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/detail_pesanan_screen.dart';
-import 'screens/tambah_pesanan_screen.dart';
+import 'screens/form_pesanan_screen.dart';
 import 'utils/theme.dart';
+import 'widgets/empty_state.dart';
 import 'widgets/sidebar_menu.dart';
 
 Future<void> main() async {
@@ -19,7 +21,7 @@ Future<void> main() async {
   runApp(const KelolaKateringApp());
 }
 
-/// Root widget aplikasi KelolaKatering.
+/// Root widget aplikasi Mustika Ayu Catering.
 ///
 /// Menggunakan [AppTheme.light] sebagai tema Material 3
 /// dan [CekStatusLogin] sebagai halaman awal.
@@ -36,7 +38,7 @@ class KelolaKateringApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KelolaKatering',
+      title: 'Mustika Ayu Catering',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: halamanAwal,
@@ -46,13 +48,11 @@ class KelolaKateringApp extends StatelessWidget {
 
 /// Pembungkus dua tujuan utama: Dashboard dan Daftar Pesanan.
 ///
-/// Sesuai rancangan navigasi Modul 3 dan wireframe Figma:
 /// - ponsel (lebar < 600 px): [NavigationBar] di bawah;
-/// - layar lebar (lebar ≥ 600 px): [SidebarMenu] di kiri.
-/// Isi dan urutan menu sama di keduanya.
+/// - layar lebar (lebar >= 600 px): [SidebarMenu] di kiri.
 ///
-/// Index 0 = Dashboard, Index 1 = Daftar Pesanan. [IndexedStack] menjaga
-/// state tiap tab (mis. kata pencarian) saat berpindah tab.
+/// Data pesanan dibaca sekali dari [Repositori] dan dibagikan ke kedua
+/// halaman, sehingga angka di Dashboard dan isi Daftar Pesanan selalu sama.
 class HomeShell extends StatefulWidget {
   /// Dipanggil saat pemilik menekan Keluar. Jika null, tombol disembunyikan.
   final VoidCallback? onKeluar;
@@ -65,13 +65,17 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
+  late final Stream<List<Pesanan>> _streamPesanan =
+      Repositori.instance.pantauPesanan();
 
-  void _pilihTab(int index) {
-    setState(() => _currentIndex = index);
+  void _pilihTab(int index) => setState(() => _currentIndex = index);
+
+  void _tampilkanPesan(String pesan) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(pesan)));
   }
 
-  /// Membuka Detail Pesanan. Setelah kembali, halaman digambar ulang
-  /// karena status bisa saja diubah, pesanan diedit, atau dihapus.
   Future<void> _bukaDetailPesanan(Pesanan pesanan) async {
     final hasil = await Navigator.push<HasilDetail>(
       context,
@@ -79,54 +83,59 @@ class _HomeShellState extends State<HomeShell> {
         builder: (context) => DetailPesananScreen(pesanan: pesanan),
       ),
     );
-    if (!mounted) return;
-    setState(() {});
-
-    if (hasil == HasilDetail.dihapus) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Pesanan dihapus.')));
+    if (mounted && hasil == HasilDetail.dihapus) {
+      _tampilkanPesan('Pesanan dihapus.');
     }
   }
 
-  /// Membuka Form Tambah Pesanan, lalu menggambar ulang halaman
-  /// ketika pengguna berhasil menyimpan pesanan baru.
   Future<void> _bukaFormTambah() async {
     final berhasil = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (context) => const TambahPesananScreen()),
+      MaterialPageRoute(builder: (context) => const FormPesananScreen()),
     );
-
-    // Halaman bisa saja sudah ditutup saat form masih terbuka.
-    if (!mounted || berhasil != true) return;
-
-    setState(() {});
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Pesanan baru berhasil disimpan.')),
-      );
+    if (mounted && berhasil == true) {
+      _tampilkanPesan('Pesanan baru berhasil disimpan.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final lebar = AppTheme.layarLebar(context);
 
-    final halaman = IndexedStack(
-      index: _currentIndex,
-      children: [
-        DashboardScreen(
-          onLihatSemua: () => _pilihTab(1),
-          onPesananTap: _bukaDetailPesanan,
-          onTambah: _bukaFormTambah,
-          onKeluar: widget.onKeluar,
-        ),
-        DaftarPesananScreen(
-          onPesananTap: _bukaDetailPesanan,
-          onTambah: _bukaFormTambah,
-        ),
-      ],
+    final halaman = StreamBuilder<List<Pesanan>>(
+      stream: _streamPesanan,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: EmptyState(
+              icon: Icons.cloud_off_outlined,
+              title: 'Data tidak dapat dimuat',
+              subtitle: '${snapshot.error}',
+            ),
+          );
+        }
+        final semua = snapshot.data ?? const <Pesanan>[];
+        final memuat = !snapshot.hasData;
+        return IndexedStack(
+          index: _currentIndex,
+          children: [
+            DashboardScreen(
+              semua: semua,
+              memuat: memuat,
+              onLihatSemua: () => _pilihTab(1),
+              onPesananTap: _bukaDetailPesanan,
+              onTambah: _bukaFormTambah,
+              onKeluar: widget.onKeluar,
+            ),
+            DaftarPesananScreen(
+              semua: semua,
+              memuat: memuat,
+              onPesananTap: _bukaDetailPesanan,
+              onTambah: _bukaFormTambah,
+            ),
+          ],
+        );
+      },
     );
 
     if (lebar) {
