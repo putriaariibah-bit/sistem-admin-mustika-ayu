@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "858962587231",
+    "project_id": "mustika-ayu-catering",
+    "storage_bucket": "mustika-ayu-catering.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:858962587231:android:955798138ca147349875ea",
+        "android_client_info": {
+          "package_name": "com.mustikaayu.catering"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArV6x1Y5VhUe8wMmcHgJqw65YqHkRfPVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
