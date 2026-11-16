@@ -161,29 +161,34 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       body: halaman,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: _pilihTab,
-        destinations: const [
-          NavigationDestination(
-            key: Key('nav-dashboard'),
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            key: Key('nav-daftar-pesanan'),
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Daftar Pesanan',
-          ),
-          NavigationDestination(
-            key: Key('nav-rekap'),
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Rekap',
-          ),
-        ],
+      bottomNavigationBar: DecoratedBox(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: AppTheme.garisKartu)),
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: _pilihTab,
+          destinations: const [
+            NavigationDestination(
+              key: Key('nav-dashboard'),
+              icon: Icon(Icons.grid_view_outlined),
+              selectedIcon: Icon(Icons.grid_view),
+              label: 'Dashboard',
+            ),
+            NavigationDestination(
+              key: Key('nav-daftar-pesanan'),
+              icon: Icon(Icons.receipt_long_outlined),
+              selectedIcon: Icon(Icons.receipt_long),
+              label: 'Daftar Pesanan',
+            ),
+            NavigationDestination(
+              key: Key('nav-rekap'),
+              icon: Icon(Icons.bar_chart_outlined),
+              selectedIcon: Icon(Icons.bar_chart),
+              label: 'Rekap',
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../utils/theme.dart';
+import 'logo_usaha.dart';
 
 /// Sidebar menu untuk layar lebar (versi web).
 ///
 /// Sesuai rancangan web Figma: nama aplikasi di atas, lalu menu
 /// Dashboard dan Daftar Pesanan dengan urutan yang sama seperti
-/// navigasi bawah di ponsel. Menu aktif berlatar primer.
+/// navigasi bawah di ponsel. Menu aktif berlatar biru muda.
 class SidebarMenu extends StatelessWidget {
   /// Index menu aktif: 0 = Dashboard, 1 = Daftar Pesanan.
   final int indeksAktif;
@@ -29,8 +30,8 @@ class SidebarMenu extends StatelessWidget {
     return Container(
       width: AppTheme.lebarSidebar,
       decoration: const BoxDecoration(
-        color: AppTheme.permukaan,
-        border: Border(right: BorderSide(color: AppTheme.garis)),
+        color: Colors.white,
+        border: Border(right: BorderSide(color: AppTheme.garisKartu)),
       ),
       child: SafeArea(
         right: false,
@@ -42,17 +43,26 @@ class SidebarMenu extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.fromLTRB(
                   AppTheme.spacing4,
-                  AppTheme.spacing12,
+                  AppTheme.spacing8,
                   AppTheme.spacing4,
                   AppTheme.spacing24,
                 ),
-                child: Text(
-                  'Mustika Ayu Catering',
-                  style: TextStyle(
-                    fontSize: AppTheme.subjudul,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary,
-                  ),
+                child: Row(
+                  children: [
+                    LogoUsaha(ukuran: 40),
+                    SizedBox(width: AppTheme.spacing12 - 2),
+                    Expanded(
+                      child: Text(
+                        'Mustika Ayu Catering',
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.25,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               _ItemMenu(
@@ -112,13 +122,13 @@ class _ItemMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final warna = aktif ? AppTheme.onPrimary : AppTheme.textSecondary;
+    final warna = aktif ? AppTheme.primary : AppTheme.textSecondary;
     return Material(
-      color: aktif ? AppTheme.primary : Colors.transparent,
-      borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+      color: aktif ? AppTheme.primaryMuda : Colors.transparent,
+      borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+        borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppTheme.spacing12,
@@ -136,8 +146,8 @@ class _ItemMenu extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: AppTheme.isi,
-                    fontWeight: aktif ? FontWeight.w600 : FontWeight.w400,
+                    fontSize: 14,
+                    fontWeight: aktif ? FontWeight.w600 : FontWeight.w500,
                     color: warna,
                   ),
                 ),

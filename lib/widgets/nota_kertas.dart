@@ -33,6 +33,18 @@ class NotaKertas extends StatelessWidget {
         child: Text(isi, style: gaya, textAlign: rata),
       );
 
+  /// Sel judul kolom: selalu satu baris, mengecil bila kolom sempit.
+  Widget _judulKolom(String isi, {TextAlign rata = TextAlign.left}) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: rata == TextAlign.center
+              ? Alignment.center
+              : Alignment.centerLeft,
+          child: Text(isi, style: _tebal, maxLines: 1, softWrap: false),
+        ),
+      );
+
   TableRow _barisTabel(BarisNota b) => TableRow(
         children: [
           _sel(b.banyak, _teks),
@@ -91,6 +103,7 @@ class NotaKertas extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: 5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -108,23 +121,23 @@ class NotaKertas extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppTheme.spacing12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Tanggal : ${Format.tanggalAngka(n.tanggalNota)}',
-                    key: const Key('nota-tanggal'),
-                    style: _teks,
-                  ),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 160),
-                    child: Text(
+              Flexible(
+                flex: 4,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tanggal : ${Format.tanggalAngka(n.tanggalNota)}',
+                      key: const Key('nota-tanggal'),
+                      style: _teks,
+                    ),
+                    Text(
                       'Nama     : ${n.namaPelanggan}',
                       key: const Key('nota-nama'),
                       style: _teks,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -139,7 +152,7 @@ class NotaKertas extends StatelessWidget {
               verticalInside: _garis,
             ),
             columnWidths: const {
-              0: FlexColumnWidth(1.1),
+              0: FlexColumnWidth(1.3),
               1: FlexColumnWidth(2.8),
               2: FlexColumnWidth(1.5),
               3: FlexColumnWidth(1.6),
@@ -148,10 +161,10 @@ class NotaKertas extends StatelessWidget {
             children: [
               TableRow(
                 children: [
-                  _sel('Banyak', _tebal),
-                  _sel('Nama', _tebal, rata: TextAlign.center),
-                  _sel('Harga', _tebal, rata: TextAlign.center),
-                  _sel('Jumlah', _tebal, rata: TextAlign.center),
+                  _judulKolom('Banyak'),
+                  _judulKolom('Nama', rata: TextAlign.center),
+                  _judulKolom('Harga', rata: TextAlign.center),
+                  _judulKolom('Jumlah', rata: TextAlign.center),
                 ],
               ),
               for (final k in n.menu) ...[
@@ -183,7 +196,13 @@ class NotaKertas extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text('Status pembayaran  ', style: _teks),
+              Flexible(
+                child: Text(
+                  'Status pembayaran  ',
+                  style: _teks,
+                  textAlign: TextAlign.right,
+                ),
+              ),
               StatusBadge(n.status),
             ],
           ),

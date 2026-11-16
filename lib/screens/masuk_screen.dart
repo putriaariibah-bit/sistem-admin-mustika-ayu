@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/theme.dart';
 import '../utils/validasi_masuk.dart';
+import '../widgets/logo_usaha.dart';
 
 /// Halaman Masuk (proses 1.0 pada DFD level 0, KF-01).
 ///
@@ -84,6 +85,8 @@ class _MasukScreenState extends State<MasukScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const Center(child: LogoUsaha(ukuran: 72)),
+                    const SizedBox(height: AppTheme.spacing16),
                     const Text(
                       'Mustika Ayu Catering',
                       textAlign: TextAlign.center,
