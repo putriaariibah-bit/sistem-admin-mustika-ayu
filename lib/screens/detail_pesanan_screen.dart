@@ -13,6 +13,7 @@ import '../utils/theme.dart';
 import '../widgets/kartu_bagian.dart';
 import '../widgets/status_badge.dart';
 import 'form_pesanan_screen.dart';
+import 'nota_screen.dart';
 
 /// Hasil yang dikirim Detail Pesanan ke pemanggil lewat [Navigator.pop].
 enum HasilDetail { dihapus }
@@ -21,12 +22,20 @@ enum HasilDetail { dihapus }
 ///
 /// Memuat data pesanan, rincian menu, ongkos kirim, total, status dan
 /// daftar pembayaran (KF-07), riwayat perubahan (KF-06), serta tombol
-/// Ubah Pesanan dan Hapus Pesanan dengan konfirmasi (BB-14).
+/// Lihat Nota (KF-08), Ubah Pesanan, dan Hapus Pesanan dengan
+/// konfirmasi (BB-14).
 /// Data selalu diambil terbaru dari Firestore.
 class DetailPesananScreen extends StatelessWidget {
   final Pesanan pesanan;
 
   const DetailPesananScreen({super.key, required this.pesanan});
+
+  void _bukaNota(BuildContext context, Pesanan p) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NotaScreen(pesanan: p)),
+    );
+  }
 
   Future<void> _bukaUbah(BuildContext context, Pesanan p) async {
     final berhasil = await Navigator.push<bool>(
@@ -126,6 +135,7 @@ class DetailPesananScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(AppTheme.marginTepi),
                     child: _IsiDetail(
                       pesanan: p,
+                      onBukaNota: () => _bukaNota(context, p),
                       onUbah: () => _bukaUbah(context, p),
                       onCatatPembayaran: () => _catatPembayaran(context, p),
                       onHapus: () => _hapus(context, p),
@@ -255,12 +265,14 @@ class _KepalaDetail extends StatelessWidget {
 
 class _IsiDetail extends StatelessWidget {
   final Pesanan pesanan;
+  final VoidCallback onBukaNota;
   final VoidCallback onUbah;
   final VoidCallback onCatatPembayaran;
   final VoidCallback onHapus;
 
   const _IsiDetail({
     required this.pesanan,
+    required this.onBukaNota,
     required this.onUbah,
     required this.onCatatPembayaran,
     required this.onHapus,
@@ -409,6 +421,13 @@ class _IsiDetail extends StatelessWidget {
           ikon: Icons.history,
           children: [_RiwayatPerubahan(pesananId: p.id)],
         ),
+        FilledButton.icon(
+          key: const Key('lihat-nota'),
+          onPressed: onBukaNota,
+          icon: const Icon(Icons.receipt_long_outlined, size: 20),
+          label: const Text('Lihat Nota'),
+        ),
+        const SizedBox(height: AppTheme.spacing12),
         OutlinedButton.icon(
           key: const Key('ubah-pesanan'),
           onPressed: onUbah,

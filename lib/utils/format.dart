@@ -24,6 +24,12 @@ class Format {
   static String tanggal(DateTime t) =>
       '${t.day} ${_bulanSingkat[t.month - 1]} ${t.year}';
 
+  /// Contoh: `09/11/2026`, format hari/bulan/tahun pada nota (KNF-06).
+  static String tanggalAngka(DateTime t) {
+    String dua(int n) => n.toString().padLeft(2, '0');
+    return '${dua(t.day)}/${dua(t.month)}/${t.year}';
+  }
+
   /// Contoh: `Kamis, 15 Oktober 2026`.
   static String tanggalPanjang(DateTime t) =>
       '${_hari[t.weekday - 1]}, ${t.day} ${_bulanPanjang[t.month - 1]} '
