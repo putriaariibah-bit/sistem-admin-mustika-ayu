@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../utils/theme.dart';
+import 'kotak_ikon.dart';
 
 /// Kartu berjudul untuk mengelompokkan isi Detail dan Form Pesanan,
 /// misalnya Rincian Menu, Pembayaran, dan Riwayat Perubahan.
@@ -20,18 +21,38 @@ class KartuBagian extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacing16),
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacing12),
+      decoration: AppTheme.dekorasiKartu,
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacing16),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.spacing16,
+          AppTheme.spacing12 + 2,
+          AppTheme.spacing16,
+          AppTheme.spacing16,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               children: [
-                Icon(ikon, size: 20, color: AppTheme.primary),
-                const SizedBox(width: AppTheme.spacing8),
-                Expanded(child: Text(judul, style: AppTheme.gayaSeksi)),
+                KotakIkon(
+                  ikon: ikon,
+                  warna: AppTheme.primary,
+                  latar: AppTheme.primaryMuda,
+                  ukuran: 30,
+                ),
+                const SizedBox(width: AppTheme.spacing12 - 2),
+                Expanded(
+                  child: Text(
+                    judul,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                ),
                 ?aksi,
               ],
             ),

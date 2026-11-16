@@ -74,7 +74,31 @@ class AppTheme {
 
   // ── Dimensi komponen ────────────────────────────────────────
   static const double tinggiTombol = 48.0;
-  static const double sudutKartu = 8.0;
+
+  /// Sudut kartu putih (desain kartu putih, 16 Nov 2026).
+  static const double sudutKartu = 12.0;
+
+  /// Sudut tombol dan kolom isian.
+  static const double sudutTombol = 10.0;
+
+  /// Garis tipis kartu putih.
+  static const Color garisKartu = Color(0xFFE5E7EB);
+
+  /// Garis tombol sekunder (bergaris).
+  static const Color garisTombol = Color(0xFFC9D2DF);
+
+  /// Teks tersier, mis. tanggal nota pada kartu pesanan.
+  static const Color textTersier = Color(0xFF8A93A0);
+
+  /// Kartu putih: sudut 12, garis tipis, bayangan sangat halus.
+  static const BoxDecoration dekorasiKartu = BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.all(Radius.circular(sudutKartu)),
+    border: Border.fromBorderSide(BorderSide(color: garisKartu)),
+    boxShadow: [
+      BoxShadow(color: Color(0x0D101828), blurRadius: 2, offset: Offset(0, 1)),
+    ],
+  );
 
   /// Lebar layar minimal yang dianggap layar lebar (browser).
   ///
@@ -132,7 +156,7 @@ class AppTheme {
   static ThemeData get light {
     final scheme = colorScheme;
     final bentukTombol = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(sudutKartu),
+      borderRadius: BorderRadius.circular(sudutTombol),
     );
 
     return ThemeData(
@@ -156,14 +180,14 @@ class AppTheme {
           color: textPrimary,
         ),
       ),
-      // ── Card bergaris tipis tanpa bayangan ───────────────────
+      // ── Card putih bergaris tipis ────────────────────────────
       cardTheme: CardThemeData(
         color: latar,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(sudutKartu),
-          side: const BorderSide(color: garis),
+          side: const BorderSide(color: garisKartu),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -201,7 +225,7 @@ class AppTheme {
           foregroundColor: primary,
           minimumSize: const Size(0, tinggiTombol),
           shape: bentukTombol,
-          side: const BorderSide(color: primary, width: 1.5),
+          side: const BorderSide(color: garisTombol),
           textStyle: const TextStyle(
             fontFamily: fontFamily,
             fontSize: isi,
@@ -230,23 +254,23 @@ class AppTheme {
           fontSize: keterangan,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(sudutKartu),
+          borderRadius: BorderRadius.circular(sudutTombol),
           borderSide: const BorderSide(color: garis),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(sudutKartu),
-          borderSide: const BorderSide(color: Color(0xFFA3ABB6)),
+          borderRadius: BorderRadius.circular(sudutTombol),
+          borderSide: const BorderSide(color: garis),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(sudutKartu),
+          borderRadius: BorderRadius.circular(sudutTombol),
           borderSide: const BorderSide(color: primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(sudutKartu),
+          borderRadius: BorderRadius.circular(sudutTombol),
           borderSide: const BorderSide(color: danger),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(sudutKartu),
+          borderRadius: BorderRadius.circular(sudutTombol),
           borderSide: const BorderSide(color: danger, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -259,7 +283,7 @@ class AppTheme {
         backgroundColor: latar,
         selectedColor: primary,
         disabledColor: permukaan,
-        side: const BorderSide(color: Color(0xFFA3ABB6)),
+        side: const BorderSide(color: garis),
         shape: const StadiumBorder(),
         showCheckmark: false,
         labelStyle: const TextStyle(
@@ -282,9 +306,9 @@ class AppTheme {
       ),
       // ── NavigationBar bawah (ponsel) ─────────────────────────
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: permukaan,
+        backgroundColor: latar,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: primary.withValues(alpha: 0.12),
+        indicatorColor: primaryMuda,
         height: 64,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final aktif = states.contains(WidgetState.selected);
