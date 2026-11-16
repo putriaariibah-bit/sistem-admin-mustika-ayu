@@ -7,8 +7,9 @@ import 'status_badge.dart';
 
 /// Kartu ringkasan satu pesanan pada Dashboard, Daftar Pesanan, dan Rekap.
 ///
-/// Garis tepi kiri berwarna status pembayaran, sehingga pesanan yang
-/// belum dibayar mudah terlihat saat daftar digulir.
+/// Kartu putih: nama dan total di atas, ringkasan menu, lalu keterangan
+/// (jenis pesanan atau sisa tagihan) dan tanggal nota di kiri bawah serta
+/// badge status pembayaran di kanan bawah.
 class PesananCard extends StatelessWidget {
   final Pesanan pesanan;
   final VoidCallback? onTap;
@@ -18,7 +19,7 @@ class PesananCard extends StatelessWidget {
     super.key,
     required this.pesanan,
     this.onTap,
-    this.margin = const EdgeInsets.symmetric(vertical: 6),
+    this.margin = const EdgeInsets.symmetric(vertical: 5),
   });
 
   String get _ringkasMenu {
@@ -31,99 +32,98 @@ class PesananCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = pesanan;
     final status = p.statusPembayaran;
-    return Card(
+    final lunas = status == StatusPembayaran.lunas;
+    final radius = BorderRadius.circular(AppTheme.sudutKartu);
+
+    return Container(
       margin: margin,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(width: 4, color: WarnaStatus.utama(status)),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppTheme.spacing12,
-                    AppTheme.spacing12,
-                    AppTheme.spacing16,
-                    AppTheme.spacing12,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              p.namaPelanggan,
-                              style: const TextStyle(
-                                fontSize: AppTheme.isi,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppTheme.spacing8),
-                          Text(
-                            Format.rupiah(p.totalTagihan),
-                            style: const TextStyle(
-                              fontSize: AppTheme.isi,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
-                              fontFeatures: AppTheme.angkaRata,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _ringkasMenu,
+      decoration: AppTheme.dekorasiKartu,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        p.namaPelanggan,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: AppTheme.keterangan,
-                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.isi,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: AppTheme.spacing8),
-                      Row(
-                        children: [
-                          StatusBadge(status),
-                          const SizedBox(width: AppTheme.spacing8),
-                          Expanded(
-                            child: Text(
-                              status == StatusPembayaran.lunas
-                                  ? p.jenisPesanan.label
-                                  : 'Sisa ${Format.rupiah(p.sisaTagihan)}',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: AppTheme.keterangan,
-                                fontWeight: status == StatusPembayaran.lunas
-                                    ? FontWeight.w400
-                                    : FontWeight.w600,
-                                color: status == StatusPembayaran.lunas
-                                    ? AppTheme.textSecondary
-                                    : WarnaStatus.utama(status),
-                                fontFeatures: AppTheme.angkaRata,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'Nota ${Format.tanggal(p.tanggalNota)}',
-                            style: const TextStyle(
-                              fontSize: AppTheme.keterangan,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(width: AppTheme.spacing8),
+                    Text(
+                      Format.rupiah(p.totalTagihan),
+                      style: const TextStyle(
+                        fontSize: AppTheme.isi,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                        fontFeatures: AppTheme.angkaRata,
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  _ringkasMenu,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: AppTheme.keterangan,
+                    color: AppTheme.textSecondary,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: lunas
+                                  ? p.jenisPesanan.label
+                                  : 'Sisa ${Format.rupiah(p.sisaTagihan)}',
+                              style: lunas
+                                  ? null
+                                  : TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: WarnaStatus.utama(status),
+                                    ),
+                            ),
+                            TextSpan(
+                              text: ' · Nota ${Format.tanggal(p.tanggalNota)}',
+                            ),
+                          ],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textTersier,
+                          fontFeatures: AppTheme.angkaRata,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacing8),
+                    StatusBadge(status),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
