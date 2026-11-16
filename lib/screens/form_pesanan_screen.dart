@@ -7,7 +7,9 @@ import '../models/pelanggan.dart';
 import '../models/pesanan.dart';
 import '../models/rincian_menu.dart';
 import '../utils/format.dart';
+import '../utils/rupiah_input.dart';
 import '../utils/theme.dart';
+import '../widgets/kartu_bagian.dart';
 import 'pilih_pelanggan_screen.dart';
 
 /// Form Tambah Pesanan dan Ubah Pesanan (proses 3.1 dan 3.3,
@@ -86,7 +88,9 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
   final List<_BarisMenu> _menu = [];
   final List<_BarisOngkir> _ongkir = [];
 
-  String? _pesanPelanggan;
+  late final Stream<List<Pelanggan>> _streamPelanggan =
+      Repositori.instance.pantauPelanggan();
+  TextEditingController? _pelangganController;
   String? _pesanRincian;
   bool _menyimpan = false;
 
@@ -111,14 +115,14 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
         tanggalKirim: r.tanggalKirim,
         nama: r.namaMenu,
         porsi: '${r.jumlahPorsi}',
-        harga: '${r.hargaPerPorsi}',
+        harga: Format.ribuan(r.hargaPerPorsi),
       ));
     }
     for (final o in awal.ongkosKirim) {
       _ongkir.add(_BarisOngkir(
         keterangan: o.keterangan,
         jumlah: '${o.jumlahKirim}',
-        tarif: '${o.tarif}',
+        tarif: Format.ribuan(o.tarif),
       ));
     }
   }
@@ -137,17 +141,40 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
   int get _totalMenu => _menu.fold(0, (j, b) => j + b.subtotal);
   int get _totalOngkir => _ongkir.fold(0, (j, b) => j + b.subtotal);
 
+  /// Membuka halaman kelola pelanggan; pelanggan yang dipilih dipakai.
   Future<void> _pilihPelanggan() async {
     final dipilih = await Navigator.push<Pelanggan>(
       context,
       MaterialPageRoute(builder: (context) => const PilihPelangganScreen()),
     );
     if (dipilih == null || !mounted) return;
+    _pakaiPelanggan(dipilih);
+  }
+
+  void _pakaiPelanggan(Pelanggan p) {
     setState(() {
-      _pelangganId = dipilih.id;
-      _namaPelanggan = dipilih.nama;
-      _pesanPelanggan = null;
+      _pelangganId = p.id;
+      _namaPelanggan = p.nama;
     });
+    _pelangganController?.text = p.nama;
+  }
+
+  /// Saran nama dipilih; pelanggan baru langsung disimpan (KF-02).
+  Future<void> _pilihSaran(_OpsiPelanggan opsi) async {
+    final ada = opsi.pelanggan;
+    if (ada != null) {
+      _pakaiPelanggan(ada);
+      return;
+    }
+    final baru = await Repositori.instance
+        .simpanPelanggan(Pelanggan(nama: opsi.namaBaru));
+    if (!mounted) return;
+    _pakaiPelanggan(baru);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text('Pelanggan ${baru.nama} ditambahkan.')),
+      );
   }
 
   Future<DateTime?> _pilihTanggal(DateTime awal) => showDatePicker(
@@ -216,12 +243,9 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
   Future<void> _simpan() async {
     final kolomValid = _formKey.currentState!.validate();
     setState(() {
-      _pesanPelanggan = _pelangganId.isEmpty ? 'Pelanggan wajib dipilih' : null;
       _pesanRincian = _menu.isEmpty ? 'Rincian menu wajib diisi' : null;
     });
-    if (!kolomValid || _pesanPelanggan != null || _pesanRincian != null) {
-      return;
-    }
+    if (!kolomValid || _pesanRincian != null) return;
 
     final pesanan = _susunPesanan();
     final awal = widget.pesananAwal;
@@ -252,14 +276,6 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
 
   // ── Tampilan ─────────────────────────────────────────────────
 
-  Widget _label(String teks) => Padding(
-        padding: const EdgeInsets.only(
-          top: AppTheme.spacing24,
-          bottom: AppTheme.spacing8,
-        ),
-        child: Text(teks.toUpperCase(), style: AppTheme.gayaLabelSeksi),
-      );
-
   Widget _tombolTanggal({
     required Key key,
     required String label,
@@ -278,9 +294,13 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
 
   Widget _kartuMenu(int i) {
     final b = _menu[i];
-    return Card(
+    return Container(
       key: ObjectKey(b),
       margin: const EdgeInsets.only(bottom: AppTheme.spacing12),
+      decoration: BoxDecoration(
+        color: AppTheme.permukaan,
+        borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spacing12),
         child: Column(
@@ -289,7 +309,14 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
             Row(
               children: [
                 Expanded(
-                  child: Text('Menu ${i + 1}', style: AppTheme.gayaSeksi),
+                  child: Text(
+                    'Menu ${i + 1}',
+                    style: const TextStyle(
+                      fontSize: AppTheme.isi,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primary,
+                    ),
+                  ),
                 ),
                 IconButton(
                   key: Key('hapus-menu-$i'),
@@ -338,6 +365,7 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
                       labelText: 'Harga per porsi',
                       prefixText: 'Rp ',
                     ),
+                    inputFormatters: [RupiahInputFormatter()],
                     validator: AturanPesanan.validasiHarga,
                     onChanged: (_) => setState(() {}),
                   ),
@@ -362,9 +390,13 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
 
   Widget _kartuOngkir(int i) {
     final b = _ongkir[i];
-    return Card(
+    return Container(
       key: ObjectKey(b),
       margin: const EdgeInsets.only(bottom: AppTheme.spacing12),
+      decoration: BoxDecoration(
+        color: AppTheme.permukaan,
+        borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spacing12),
         child: Column(
@@ -414,6 +446,7 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
                       labelText: 'Tarif',
                       prefixText: 'Rp ',
                     ),
+                    inputFormatters: [RupiahInputFormatter()],
                     validator: AturanPesanan.validasiTarif,
                     onChanged: (_) => setState(() {}),
                   ),
@@ -441,6 +474,7 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
       fontSize: tebal ? AppTheme.subjudul : AppTheme.isi,
       fontWeight: tebal ? FontWeight.w700 : FontWeight.w400,
       color: AppTheme.textPrimary,
+      fontFeatures: AppTheme.angkaRata,
     );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing4),
@@ -453,9 +487,95 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
     );
   }
 
+  Widget _kolomPelanggan() {
+    return StreamBuilder<List<Pelanggan>>(
+      stream: _streamPelanggan,
+      builder: (context, snapshot) {
+        final daftar = snapshot.data ?? const <Pelanggan>[];
+        return Autocomplete<_OpsiPelanggan>(
+          initialValue: TextEditingValue(text: _namaPelanggan),
+          displayStringForOption: (o) => o.nama,
+          optionsBuilder: (nilai) {
+            final kata = nilai.text.trim();
+            if (kata.isEmpty) return const <_OpsiPelanggan>[];
+            final kecil = kata.toLowerCase();
+            final cocok = [
+              for (final p in daftar)
+                if (p.nama.toLowerCase().contains(kecil)) _OpsiPelanggan.ada(p),
+            ];
+            final sudahAda = daftar.any((p) => p.nama.toLowerCase() == kecil);
+            if (!sudahAda) cocok.add(_OpsiPelanggan.baru(kata));
+            return cocok;
+          },
+          onSelected: _pilihSaran,
+          optionsViewBuilder: (context, onSelected, opsi) => Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 240, maxWidth: 480),
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  children: [
+                    for (final o in opsi)
+                      ListTile(
+                        key: Key(o.pelanggan == null
+                            ? 'saran-pelanggan-baru'
+                            : 'saran-${o.pelanggan!.id}'),
+                        leading: Icon(
+                          o.pelanggan == null
+                              ? Icons.person_add_alt_1_outlined
+                              : Icons.person_outline,
+                          color: AppTheme.primary,
+                        ),
+                        title: Text(o.pelanggan == null
+                            ? 'Tambah pelanggan baru: ${o.nama}'
+                            : o.nama),
+                        onTap: () => onSelected(o),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
+            _pelangganController = controller;
+            return TextFormField(
+              key: const Key('kolom-pelanggan'),
+              controller: controller,
+              focusNode: focusNode,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: 'Pelanggan',
+                hintText: 'Ketik nama pelanggan',
+                prefixIcon: const Icon(Icons.person_outline, size: 20),
+                suffixIcon: IconButton(
+                  key: const Key('pilih-pelanggan'),
+                  tooltip: 'Kelola pelanggan',
+                  icon: const Icon(Icons.people_alt_outlined),
+                  onPressed: _pilihPelanggan,
+                ),
+              ),
+              onChanged: (teks) {
+                if (_pelangganId.isNotEmpty && teks.trim() != _namaPelanggan) {
+                  setState(() => _pelangganId = '');
+                }
+              },
+              validator: (_) =>
+                  _pelangganId.isEmpty ? 'Pelanggan wajib dipilih' : null,
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.permukaan,
       appBar: AppBar(
         title: Text(_modeUbah ? 'Ubah Pesanan' : 'Tambah Pesanan'),
       ),
@@ -471,82 +591,105 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _label('Pesanan'),
-                    OutlinedButton.icon(
-                      key: const Key('pilih-pelanggan'),
-                      onPressed: _pilihPelanggan,
-                      icon: const Icon(Icons.person_outline, size: 18),
-                      label: Text(_namaPelanggan.isEmpty
-                          ? 'Pilih pelanggan'
-                          : 'Pelanggan: $_namaPelanggan'),
-                    ),
-                    if (_pesanPelanggan != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: AppTheme.spacing4),
-                        child: Text(
-                          _pesanPelanggan!,
+                    KartuBagian(
+                      judul: 'Pesanan',
+                      ikon: Icons.receipt_long_outlined,
+                      children: [
+                        _kolomPelanggan(),
+                        const SizedBox(height: AppTheme.spacing12),
+                        _tombolTanggal(
+                          key: const Key('tanggal-nota'),
+                          label: 'Tanggal nota',
+                          tanggal: _tanggalNota,
+                          onDipilih: (t) => _tanggalNota = t,
+                        ),
+                        const SizedBox(height: AppTheme.spacing16),
+                        SegmentedButton<JenisPesanan>(
+                          key: const Key('jenis-pesanan'),
+                          showSelectedIcon: false,
+                          segments: [
+                            for (final j in JenisPesanan.values)
+                              ButtonSegment(value: j, label: Text(j.label)),
+                          ],
+                          selected: {_jenis},
+                          onSelectionChanged: (pilihan) =>
+                              setState(() => _jenis = pilihan.first),
+                        ),
+                        const SizedBox(height: AppTheme.spacing4),
+                        Text(
+                          _jenis == JenisPesanan.sekaligus
+                              ? 'Satu kali kirim, misalnya pesanan untuk acara.'
+                              : 'Dikirim beberapa hari dalam satu nota.',
                           style: const TextStyle(
-                            color: AppTheme.danger,
                             fontSize: AppTheme.keterangan,
+                            color: AppTheme.textSecondary,
                           ),
                         ),
-                      ),
-                    const SizedBox(height: AppTheme.spacing12),
-                    _tombolTanggal(
-                      key: const Key('tanggal-nota'),
-                      label: 'Tanggal nota',
-                      tanggal: _tanggalNota,
-                      onDipilih: (t) => _tanggalNota = t,
-                    ),
-                    const SizedBox(height: AppTheme.spacing12),
-                    DropdownButtonFormField<JenisPesanan>(
-                      key: const Key('jenis-pesanan'),
-                      initialValue: _jenis,
-                      decoration:
-                          const InputDecoration(labelText: 'Jenis pesanan'),
-                      items: [
-                        for (final j in JenisPesanan.values)
-                          DropdownMenuItem(value: j, child: Text(j.label)),
                       ],
-                      onChanged: (j) => setState(() => _jenis = j ?? _jenis),
                     ),
-                    _label('Rincian menu'),
-                    for (var i = 0; i < _menu.length; i++) _kartuMenu(i),
-                    if (_pesanRincian != null)
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: AppTheme.spacing8),
-                        child: Text(
-                          _pesanRincian!,
-                          key: const Key('pesan-rincian'),
-                          style: const TextStyle(
-                            color: AppTheme.danger,
+                    KartuBagian(
+                      judul: 'Rincian menu',
+                      ikon: Icons.restaurant_menu_outlined,
+                      children: [
+                        for (var i = 0; i < _menu.length; i++) _kartuMenu(i),
+                        if (_pesanRincian != null)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppTheme.spacing8,
+                            ),
+                            child: Text(
+                              _pesanRincian!,
+                              key: const Key('pesan-rincian'),
+                              style: const TextStyle(
+                                color: AppTheme.danger,
+                                fontSize: AppTheme.keterangan,
+                              ),
+                            ),
+                          ),
+                        OutlinedButton.icon(
+                          key: const Key('tambah-menu'),
+                          onPressed: _tambahMenu,
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('Tambah menu'),
+                        ),
+                      ],
+                    ),
+                    KartuBagian(
+                      judul: 'Ongkos kirim',
+                      ikon: Icons.local_shipping_outlined,
+                      children: [
+                        const Text(
+                          'Dicatat di nota, tidak dihitung sebagai pendapatan.',
+                          style: TextStyle(
                             fontSize: AppTheme.keterangan,
+                            color: AppTheme.textSecondary,
                           ),
                         ),
-                      ),
-                    OutlinedButton.icon(
-                      key: const Key('tambah-menu'),
-                      onPressed: _tambahMenu,
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text('Tambah menu'),
+                        const SizedBox(height: AppTheme.spacing12),
+                        for (var i = 0; i < _ongkir.length; i++)
+                          _kartuOngkir(i),
+                        OutlinedButton.icon(
+                          key: const Key('tambah-ongkir'),
+                          onPressed: () =>
+                              setState(() => _ongkir.add(_BarisOngkir())),
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('Tambah ongkos kirim'),
+                        ),
+                      ],
                     ),
-                    _label('Ongkos kirim'),
-                    for (var i = 0; i < _ongkir.length; i++) _kartuOngkir(i),
-                    OutlinedButton.icon(
-                      key: const Key('tambah-ongkir'),
-                      onPressed: () => setState(() => _ongkir.add(_BarisOngkir())),
-                      icon: const Icon(Icons.local_shipping_outlined, size: 18),
-                      label: const Text('Tambah ongkos kirim'),
-                    ),
-                    _label('Total'),
-                    _barisTotal('Total menu', _totalMenu),
-                    _barisTotal('Total ongkos kirim', _totalOngkir),
-                    const Divider(),
-                    _barisTotal(
-                      'Total tagihan',
-                      _totalMenu + _totalOngkir,
-                      tebal: true,
+                    KartuBagian(
+                      judul: 'Total',
+                      ikon: Icons.calculate_outlined,
+                      children: [
+                        _barisTotal('Total menu', _totalMenu),
+                        _barisTotal('Total ongkos kirim', _totalOngkir),
+                        const Divider(),
+                        _barisTotal(
+                          'Total tagihan',
+                          _totalMenu + _totalOngkir,
+                          tebal: true,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -573,4 +716,16 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
       ),
     );
   }
+}
+
+/// Satu saran pada kolom pelanggan: pelanggan yang sudah ada, atau
+/// pelanggan baru dengan nama yang sedang diketik.
+class _OpsiPelanggan {
+  final Pelanggan? pelanggan;
+  final String namaBaru;
+
+  const _OpsiPelanggan.ada(Pelanggan this.pelanggan) : namaBaru = '';
+  const _OpsiPelanggan.baru(this.namaBaru) : pelanggan = null;
+
+  String get nama => pelanggan?.nama ?? namaBaru;
 }

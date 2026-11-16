@@ -11,10 +11,10 @@ void main() {
     await tester.pumpWidget(const KelolaKateringApp(halamanAwal: HomeShell()));
     await tester.pump();
 
-    // Layar uji 800 x 600 termasuk layar lebar: "Dashboard" tampil
-    // sebagai judul halaman dan sebagai menu sidebar.
-    expect(find.text('Dashboard'), findsNWidgets(2));
+    // Layar uji 800 x 600 termasuk layar lebar: menu di sidebar.
+    expect(find.byKey(const Key('nav-dashboard')), findsOneWidget);
     expect(find.byKey(const Key('nav-daftar-pesanan')), findsOneWidget);
-    expect(find.text('Belum ada pesanan'), findsWidgets);
+    expect(find.byKey(const Key('nav-rekap')), findsOneWidget);
+    expect(find.text('Tidak ada kiriman hari ini'), findsOneWidget);
   });
 }

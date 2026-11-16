@@ -29,15 +29,31 @@ class Format {
       '${_hari[t.weekday - 1]}, ${t.day} ${_bulanPanjang[t.month - 1]} '
       '${t.year}';
 
-  /// Contoh: `Rp 1.750.000`.
-  static String rupiah(int harga) {
-    final angka = harga.abs().toString();
+  /// Contoh: `1.750.000` (tanpa "Rp").
+  static String ribuan(int nilai) {
+    final angka = nilai.abs().toString();
     final hasil = StringBuffer();
     for (var i = 0; i < angka.length; i++) {
       final sisa = angka.length - i;
       hasil.write(angka[i]);
       if (sisa > 1 && sisa % 3 == 1) hasil.write('.');
     }
-    return 'Rp ${harga < 0 ? '-' : ''}$hasil';
+    return '${nilai < 0 ? '-' : ''}$hasil';
+  }
+
+  /// Contoh: `Rp 1.750.000`.
+  static String rupiah(int harga) =>
+      harga < 0 ? 'Rp -${ribuan(-harga)}' : 'Rp ${ribuan(harga)}';
+
+  /// Contoh: `November 2026`.
+  static String bulanTahun(int tahun, int bulan) =>
+      '${_bulanPanjang[bulan - 1]} $tahun';
+
+  /// Sapaan sesuai jam: pagi, siang, sore, atau malam.
+  static String sapaan(DateTime t) {
+    if (t.hour < 11) return 'Selamat pagi';
+    if (t.hour < 15) return 'Selamat siang';
+    if (t.hour < 18) return 'Selamat sore';
+    return 'Selamat malam';
   }
 }

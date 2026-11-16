@@ -9,6 +9,7 @@ import 'screens/daftar_pesanan_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/detail_pesanan_screen.dart';
 import 'screens/form_pesanan_screen.dart';
+import 'screens/rekap_screen.dart';
 import 'utils/theme.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/sidebar_menu.dart';
@@ -46,7 +47,7 @@ class KelolaKateringApp extends StatelessWidget {
   }
 }
 
-/// Pembungkus dua tujuan utama: Dashboard dan Daftar Pesanan.
+/// Pembungkus tiga tujuan utama: Dashboard, Daftar Pesanan, dan Rekap.
 ///
 /// - ponsel (lebar < 600 px): [NavigationBar] di bawah;
 /// - layar lebar (lebar >= 600 px): [SidebarMenu] di kiri.
@@ -133,6 +134,11 @@ class _HomeShellState extends State<HomeShell> {
               onPesananTap: _bukaDetailPesanan,
               onTambah: _bukaFormTambah,
             ),
+            RekapScreen(
+              semua: semua,
+              memuat: memuat,
+              onPesananTap: _bukaDetailPesanan,
+            ),
           ],
         );
       },
@@ -167,9 +173,15 @@ class _HomeShellState extends State<HomeShell> {
           ),
           NavigationDestination(
             key: Key('nav-daftar-pesanan'),
-            icon: Icon(Icons.list),
-            selectedIcon: Icon(Icons.list),
+            icon: Icon(Icons.receipt_long_outlined),
+            selectedIcon: Icon(Icons.receipt_long),
             label: 'Daftar Pesanan',
+          ),
+          NavigationDestination(
+            key: Key('nav-rekap'),
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart),
+            label: 'Rekap',
           ),
         ],
       ),

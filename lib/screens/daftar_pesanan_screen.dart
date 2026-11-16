@@ -141,6 +141,7 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
     }
 
     return Scaffold(
+      backgroundColor: AppTheme.permukaan,
       appBar: lebar ? null : AppBar(title: const Text('Daftar Pesanan')),
       body: SafeArea(
         child: ListView(

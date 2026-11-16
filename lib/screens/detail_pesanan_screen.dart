@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../data/repositori.dart';
 import '../models/aturan_pesanan.dart';
+import '../models/konversi.dart';
 import '../models/pembayaran.dart';
 import '../models/pesanan.dart';
 import '../models/riwayat_perubahan.dart';
+import '../models/rincian_menu.dart';
 import '../utils/format.dart';
+import '../utils/rupiah_input.dart';
 import '../utils/theme.dart';
+import '../widgets/kartu_bagian.dart';
 import '../widgets/status_badge.dart';
 import 'form_pesanan_screen.dart';
 
@@ -97,26 +101,154 @@ class DetailPesananScreen extends StatelessWidget {
           );
         }
         return Scaffold(
-          appBar: AppBar(title: const Text('Detail Pesanan')),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.marginTepi),
-              child: Center(
+          backgroundColor: AppTheme.permukaan,
+          appBar: AppBar(
+            title: const Text('Detail Pesanan'),
+            backgroundColor: AppTheme.primaryGelap,
+            foregroundColor: Colors.white,
+            shape: const Border(),
+            titleTextStyle: const TextStyle(
+              fontFamily: AppTheme.fontFamily,
+              fontSize: AppTheme.subjudul,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          body: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              _KepalaDetail(pesanan: p),
+              Center(
                 child: ConstrainedBox(
                   constraints:
                       const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
-                  child: _IsiDetail(
-                    pesanan: p,
-                    onUbah: () => _bukaUbah(context, p),
-                    onCatatPembayaran: () => _catatPembayaran(context, p),
-                    onHapus: () => _hapus(context, p),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.marginTepi),
+                    child: _IsiDetail(
+                      pesanan: p,
+                      onUbah: () => _bukaUbah(context, p),
+                      onCatatPembayaran: () => _catatPembayaran(context, p),
+                      onHapus: () => _hapus(context, p),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         );
       },
+    );
+  }
+}
+
+/// Kepala biru: pelanggan, total tagihan, status, dan progres pembayaran.
+class _KepalaDetail extends StatelessWidget {
+  final Pesanan pesanan;
+
+  const _KepalaDetail({required this.pesanan});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pesanan;
+    final porsiDibayar =
+        p.totalTagihan == 0 ? 0.0 : p.totalDibayar / p.totalTagihan;
+    return Container(
+      color: AppTheme.primaryGelap,
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.marginTepi,
+        AppTheme.spacing8,
+        AppTheme.marginTepi,
+        AppTheme.spacing24,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                p.namaPelanggan,
+                style: const TextStyle(
+                  fontSize: AppTheme.judul,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacing4),
+              Text(
+                'Nota ${Format.tanggal(p.tanggalNota)}, ${p.jenisPesanan.label.toLowerCase()}',
+                style: const TextStyle(
+                  fontSize: AppTheme.keterangan,
+                  color: AppTheme.teksPanel,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacing24),
+              const Text(
+                'Total tagihan',
+                style: TextStyle(
+                  fontSize: AppTheme.keterangan,
+                  color: AppTheme.teksPanel,
+                ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      Format.rupiah(p.totalTagihan),
+                      key: const Key('total-tagihan'),
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontFeatures: AppTheme.angkaRata,
+                      ),
+                    ),
+                  ),
+                  StatusBadge(p.statusPembayaran),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacing12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  value: porsiDibayar.clamp(0.0, 1.0),
+                  minHeight: 6,
+                  backgroundColor: Colors.white.withValues(alpha: 0.15),
+                  color: p.statusPembayaran == StatusPembayaran.lunas
+                      ? const Color(0xFF7BC67E)
+                      : Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacing8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Dibayar ${Format.rupiah(p.totalDibayar)}',
+                      style: const TextStyle(
+                        fontSize: AppTheme.keterangan,
+                        color: AppTheme.teksPanel,
+                        fontFeatures: AppTheme.angkaRata,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Sisa ${Format.rupiah(p.sisaTagihan)}',
+                    key: const Key('sisa-tagihan'),
+                    style: const TextStyle(
+                      fontSize: AppTheme.keterangan,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontFeatures: AppTheme.angkaRata,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -142,27 +274,42 @@ class _IsiDetail extends StatelessWidget {
     fontSize: AppTheme.keterangan,
     color: AppTheme.textSecondary,
   );
+  static const _gayaUang = TextStyle(
+    fontSize: AppTheme.isi,
+    color: AppTheme.textPrimary,
+    fontFeatures: AppTheme.angkaRata,
+  );
 
-  Widget _label(String teks) => Padding(
-        padding: const EdgeInsets.only(
-          top: AppTheme.spacing24,
-          bottom: AppTheme.spacing8,
+  Widget _baris(String judul, String keterangan, String nilai) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(judul, style: _gayaIsi),
+                  if (keterangan.isNotEmpty) Text(keterangan, style: _gayaKecil),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppTheme.spacing8),
+            Text(nilai, style: _gayaUang),
+          ],
         ),
-        child: Text(teks.toUpperCase(), style: AppTheme.gayaLabelSeksi),
       );
 
-  Widget _baris(String kiri, String kanan, {bool tebal = false, Key? key}) {
+  Widget _total(String label, int nilai, {bool tebal = false}) {
     final gaya = tebal
-        ? _gayaIsi.copyWith(fontWeight: FontWeight.w700)
-        : _gayaIsi;
+        ? _gayaUang.copyWith(fontWeight: FontWeight.w700)
+        : _gayaUang.copyWith(color: AppTheme.textSecondary);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing4),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(kiri, style: gaya)),
-          const SizedBox(width: AppTheme.spacing8),
-          Text(kanan, key: key, style: gaya),
+          Expanded(child: Text(label, style: gaya)),
+          Text(Format.rupiah(nilai), style: gaya),
         ],
       ),
     );
@@ -171,74 +318,97 @@ class _IsiDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pesanan;
+
+    // Rincian dikelompokkan per tanggal kirim, seperti nota langganan.
+    final perTanggal = <String, List<RincianMenu>>{};
+    for (final r in p.rincian) {
+      perTanggal.putIfAbsent(Konversi.kunciTanggal(r.tanggalKirim), () => []).add(r);
+    }
+    final tanggalUrut = perTanggal.keys.toList()..sort();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          p.namaPelanggan,
-          style: const TextStyle(
-            fontSize: AppTheme.judul,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        const SizedBox(height: AppTheme.spacing4),
-        Text(
-          'Nota ${Format.tanggal(p.tanggalNota)} · ${p.jenisPesanan.label}',
-          style: _gayaKecil,
-        ),
-        _label('Rincian menu'),
-        for (final r in p.rincian)
-          _baris(
-            '${Format.tanggal(r.tanggalKirim)} · ${r.namaMenu}\n'
-                '${r.jumlahPorsi} x ${Format.rupiah(r.hargaPerPorsi)}',
-            Format.rupiah(r.subtotal),
-          ),
-        if (p.ongkosKirim.isNotEmpty) ...[
-          _label('Ongkos kirim'),
-          for (final o in p.ongkosKirim)
-            _baris(
-              '${o.keterangan.isEmpty ? 'Ongkos kirim' : o.keterangan}\n'
-                  '${o.jumlahKirim} x ${Format.rupiah(o.tarif)}',
-              Format.rupiah(o.subtotal),
-            ),
-        ],
-        _label('Total'),
-        _baris('Total menu', Format.rupiah(p.totalMenu)),
-        _baris('Total ongkos kirim', Format.rupiah(p.totalOngkir)),
-        const Divider(),
-        _baris('Total tagihan', Format.rupiah(p.totalTagihan),
-            tebal: true, key: const Key('total-tagihan')),
-        _baris('Sudah dibayar', Format.rupiah(p.totalDibayar)),
-        _baris('Sisa tagihan', Format.rupiah(p.sisaTagihan),
-            tebal: true, key: const Key('sisa-tagihan')),
-        const SizedBox(height: AppTheme.spacing8),
-        Row(
+        KartuBagian(
+          judul: 'Rincian menu',
+          ikon: Icons.restaurant_menu_outlined,
           children: [
-            const Text('Status pembayaran  ', style: _gayaKecil),
-            StatusBadge(p.statusPembayaran),
+            for (final kunci in tanggalUrut) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 2),
+                child: Text(
+                  'Kirim ${Format.tanggal(perTanggal[kunci]!.first.tanggalKirim)}',
+                  style: const TextStyle(
+                    fontSize: AppTheme.keterangan,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ),
+              for (final r in perTanggal[kunci]!)
+                _baris(
+                  r.namaMenu,
+                  '${r.jumlahPorsi} porsi x ${Format.rupiah(r.hargaPerPorsi)}',
+                  Format.rupiah(r.subtotal),
+                ),
+            ],
+            if (p.ongkosKirim.isNotEmpty) ...[
+              const Padding(
+                padding: EdgeInsets.only(top: AppTheme.spacing8, bottom: 2),
+                child: Text(
+                  'Ongkos kirim (tidak dihitung pendapatan)',
+                  style: TextStyle(
+                    fontSize: AppTheme.keterangan,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ),
+              for (final o in p.ongkosKirim)
+                _baris(
+                  o.keterangan.isEmpty ? 'Ongkos kirim' : o.keterangan,
+                  '${o.jumlahKirim} kali x ${Format.rupiah(o.tarif)}',
+                  Format.rupiah(o.subtotal),
+                ),
+            ],
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppTheme.spacing8),
+              child: Divider(),
+            ),
+            _total('Total menu', p.totalMenu),
+            _total('Total ongkos kirim', p.totalOngkir),
+            _total('Total tagihan', p.totalTagihan, tebal: true),
           ],
         ),
-        _label('Daftar pembayaran'),
-        if (p.pembayaran.isEmpty)
-          const Text('Belum ada pembayaran.', style: _gayaKecil)
-        else
-          for (final b in p.pembayaran)
-            _baris(
-              Format.tanggal(b.tanggalBayar) +
-                  (b.keterangan.isEmpty ? '' : ' · ${b.keterangan}'),
-              Format.rupiah(b.nominal),
+        KartuBagian(
+          judul: 'Pembayaran',
+          ikon: Icons.payments_outlined,
+          children: [
+            if (p.pembayaran.isEmpty)
+              const Text('Belum ada pembayaran.', style: _gayaKecil)
+            else
+              for (final b in p.pembayaran)
+                _baris(
+                  Format.tanggal(b.tanggalBayar),
+                  b.keterangan,
+                  Format.rupiah(b.nominal),
+                ),
+            const SizedBox(height: AppTheme.spacing12),
+            FilledButton.icon(
+              key: const Key('catat-pembayaran'),
+              onPressed: p.sisaTagihan > 0 ? onCatatPembayaran : null,
+              icon: const Icon(Icons.add, size: 20),
+              label: Text(p.sisaTagihan > 0
+                  ? 'Catat Pembayaran'
+                  : 'Sudah lunas'),
             ),
-        const SizedBox(height: AppTheme.spacing12),
-        FilledButton.icon(
-          key: const Key('catat-pembayaran'),
-          onPressed: p.sisaTagihan > 0 ? onCatatPembayaran : null,
-          icon: const Icon(Icons.payments_outlined, size: 20),
-          label: const Text('Catat Pembayaran'),
+          ],
         ),
-        _label('Riwayat perubahan'),
-        _RiwayatPerubahan(pesananId: p.id),
-        const SizedBox(height: AppTheme.spacing24),
+        KartuBagian(
+          judul: 'Riwayat perubahan',
+          ikon: Icons.history,
+          children: [_RiwayatPerubahan(pesananId: p.id)],
+        ),
         OutlinedButton.icon(
           key: const Key('ubah-pesanan'),
           onPressed: onUbah,
@@ -246,16 +416,17 @@ class _IsiDetail extends StatelessWidget {
           label: const Text('Ubah Pesanan'),
         ),
         const SizedBox(height: AppTheme.spacing12),
-        OutlinedButton.icon(
+        TextButton.icon(
           key: const Key('hapus-pesanan'),
           onPressed: onHapus,
-          style: OutlinedButton.styleFrom(
+          style: TextButton.styleFrom(
             foregroundColor: AppTheme.danger,
-            side: const BorderSide(color: AppTheme.danger, width: 1.5),
+            minimumSize: const Size(0, AppTheme.tinggiTombol),
           ),
           icon: const Icon(Icons.delete_outline, size: 20),
           label: const Text('Hapus Pesanan'),
         ),
+        const SizedBox(height: AppTheme.spacing24),
       ],
     );
   }
@@ -268,7 +439,7 @@ class _RiwayatPerubahan extends StatelessWidget {
 
   String _waktu(DateTime t) {
     String dua(int n) => n.toString().padLeft(2, '0');
-    return '${Format.tanggal(t)} ${dua(t.hour)}.${dua(t.minute)}';
+    return '${Format.tanggal(t)}, ${dua(t.hour)}.${dua(t.minute)}';
   }
 
   @override
@@ -279,7 +450,7 @@ class _RiwayatPerubahan extends StatelessWidget {
         final daftar = snapshot.data ?? const <RiwayatPerubahan>[];
         if (daftar.isEmpty) {
           return const Text(
-            'Belum ada perubahan.',
+            'Belum ada perubahan sejak pesanan dicatat.',
             style: TextStyle(
               fontSize: AppTheme.keterangan,
               color: AppTheme.textSecondary,
@@ -287,19 +458,68 @@ class _RiwayatPerubahan extends StatelessWidget {
           );
         }
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final r in daftar)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing4),
-                child: Text(
-                  '${_waktu(r.waktu)} · ${r.bagian}: '
-                  '${r.nilaiLama.isEmpty ? '-' : r.nilaiLama} → '
-                  '${r.nilaiBaru.isEmpty ? '-' : r.nilaiBaru}',
-                  style: const TextStyle(
-                    fontSize: AppTheme.keterangan,
-                    color: AppTheme.textPrimary,
-                  ),
+            for (var i = 0; i < daftar.length; i++)
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 5),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppTheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          if (i < daftar.length - 1)
+                            Expanded(
+                              child: Container(width: 1, color: AppTheme.garis),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacing8),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              daftar[i].bagian,
+                              style: const TextStyle(
+                                fontSize: AppTheme.isi,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              '${daftar[i].nilaiLama.isEmpty ? '-' : daftar[i].nilaiLama}'
+                              ' menjadi '
+                              '${daftar[i].nilaiBaru.isEmpty ? '-' : daftar[i].nilaiBaru}',
+                              style: const TextStyle(
+                                fontSize: AppTheme.isi,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              _waktu(daftar[i].waktu),
+                              style: const TextStyle(
+                                fontSize: AppTheme.keterangan,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],
@@ -364,6 +584,7 @@ class _DialogPembayaranState extends State<_DialogPembayaran> {
               controller: _nominalController,
               autofocus: true,
               keyboardType: TextInputType.number,
+              inputFormatters: [RupiahInputFormatter()],
               decoration: const InputDecoration(
                 labelText: 'Nominal',
                 prefixText: 'Rp ',

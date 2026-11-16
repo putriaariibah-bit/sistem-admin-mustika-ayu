@@ -65,10 +65,18 @@ class SidebarMenu extends StatelessWidget {
               const SizedBox(height: AppTheme.spacing4),
               _ItemMenu(
                 key: const Key('nav-daftar-pesanan'),
-                ikon: Icons.list,
+                ikon: Icons.receipt_long,
                 label: 'Daftar Pesanan',
                 aktif: indeksAktif == 1,
                 onTap: () => onPilih(1),
+              ),
+              const SizedBox(height: AppTheme.spacing4),
+              _ItemMenu(
+                key: const Key('nav-rekap'),
+                ikon: Icons.bar_chart,
+                label: 'Rekap',
+                aktif: indeksAktif == 2,
+                onTap: () => onPilih(2),
               ),
               if (onKeluar != null) ...[
                 const Spacer(),

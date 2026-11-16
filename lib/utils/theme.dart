@@ -21,6 +21,18 @@ class AppTheme {
   static const Color danger = Color(0xFFB3261E);
   static const Color latar = Colors.white;
 
+  /// Biru lebih gelap untuk panel utama Dashboard dan kepala Detail.
+  static const Color primaryGelap = Color(0xFF162B47);
+
+  /// Biru sangat muda untuk latar penanda terpilih.
+  static const Color primaryMuda = Color(0xFFE4EAF3);
+
+  /// Teks putih redup di atas panel biru.
+  static const Color teksPanel = Color(0xFFC9D4E3);
+
+  /// Angka uang memakai digit sama lebar agar kolom Rupiah rata.
+  static const List<FontFeature> angkaRata = [FontFeature.tabularFigures()];
+
   // ── Warna badge status pesanan (teks/garis dan latar) ───────
   static const Color statusBaru = Color(0xFF1F3A5F);
   static const Color statusBaruLatar = Color(0xFFE4EAF3);
