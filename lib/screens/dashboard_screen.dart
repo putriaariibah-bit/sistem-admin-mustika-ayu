@@ -6,17 +6,23 @@ import '../models/pesanan.dart';
 import '../utils/format.dart';
 import '../utils/theme.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/kotak_ikon.dart';
+import '../widgets/logo_usaha.dart';
 import '../widgets/pesanan_card.dart';
-import '../widgets/status_badge.dart';
 import '../widgets/tombol_tambah_pesanan.dart';
 
 /// Halaman awal setelah pemilik masuk (KF-11, Gambar 3.6(b)).
 ///
-/// Dibuka dengan panel "Kirim hari ini" yang langsung menjawab apa saja
+/// Dibuka dengan kepala berlogo dan kartu "Kiriman hari ini" yang menjawab apa saja
 /// yang harus dimasak dan dikirim hari ini, lalu ringkasan pembayaran
 /// bulan berjalan dan pesanan terbaru. Angka bulan berjalan dihitung
 /// dengan aturan yang sama dengan rekap bulanan (tanggal nota).
 class DashboardScreen extends StatelessWidget {
+  static const TextStyle _gayaSeksi = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: AppTheme.textPrimary,
+  );
   static const int _batasPesananTerbaru = 3;
   static const int _batasKirim = 5;
 
@@ -50,16 +56,38 @@ class DashboardScreen extends StatelessWidget {
     ];
 
     final isi = <Widget>[
-      _PanelHariIni(
-        sekarang: sekarang,
-        pesanan: kirimHariIni,
-        batas: _batasKirim,
-        memuat: memuat,
-        onKeluar: lebar ? null : onKeluar,
-        onPesananTap: onPesananTap,
+      Padding(
+        padding: EdgeInsets.fromLTRB(
+          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
+          lebar ? AppTheme.spacing24 : AppTheme.spacing12,
+          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
+          0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _KepalaDashboard(
+              sekarang: sekarang,
+              onKeluar: lebar ? null : onKeluar,
+            ),
+            const SizedBox(height: AppTheme.spacing16),
+            _KartuKiriman(
+              sekarang: sekarang,
+              pesanan: kirimHariIni,
+              batas: _batasKirim,
+              memuat: memuat,
+              onPesananTap: onPesananTap,
+            ),
+          ],
+        ),
       ),
       Padding(
-        padding: EdgeInsets.all(lebar ? AppTheme.spacing24 : AppTheme.marginTepi),
+        padding: EdgeInsets.fromLTRB(
+          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
+          AppTheme.spacing24,
+          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
+          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -78,25 +106,37 @@ class DashboardScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Pembayaran ${Format.bulanTahun(sekarang.year, sekarang.month)}',
-                    style: AppTheme.gayaSeksi,
+                    style: _gayaSeksi,
                   ),
                 ),
-                Text(
-                  '${rekap.jumlahPesanan} pesanan',
-                  key: const Key('ringkasan-bulan-ini'),
-                  style: const TextStyle(
-                    fontSize: AppTheme.keterangan,
-                    color: AppTheme.textSecondary,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: AppTheme.garisKartu),
+                  ),
+                  child: Text(
+                    '${rekap.jumlahPesanan} pesanan',
+                    key: const Key('ringkasan-bulan-ini'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppTheme.spacing12),
+            const SizedBox(height: AppTheme.spacing12 - 2),
             Row(
               children: [
                 for (final s in StatusPembayaran.values) ...[
                   if (s != StatusPembayaran.values.first)
-                    const SizedBox(width: AppTheme.spacing8),
+                    const SizedBox(width: AppTheme.spacing12 - 2),
                   Expanded(
                     child: _KotakStatus(
                       key: Key('ringkasan-${s.name}'),
@@ -118,11 +158,11 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: AppTheme.spacing24),
+            const SizedBox(height: AppTheme.spacing24 - 4),
             Row(
               children: [
                 const Expanded(
-                  child: Text('Pesanan terbaru', style: AppTheme.gayaSeksi),
+                  child: Text('Pesanan terbaru', style: _gayaSeksi),
                 ),
                 if (onLihatSemua != null && semua.isNotEmpty)
                   TextButton(
@@ -162,22 +202,93 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-/// Panel biru di bagian atas Dashboard: siapa saja yang dikirimi hari ini
-/// dan menu apa saja yang harus disiapkan.
-class _PanelHariIni extends StatelessWidget {
+/// Kepala Dashboard: logo, sapaan dan tanggal, nama usaha, tombol Keluar.
+class _KepalaDashboard extends StatelessWidget {
+  final DateTime sekarang;
+  final VoidCallback? onKeluar;
+
+  const _KepalaDashboard({required this.sekarang, this.onKeluar});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Row(
+        children: [
+          const LogoUsaha(),
+          const SizedBox(width: AppTheme.spacing12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${Format.sapaan(sekarang)} · ${Format.tanggalPanjang(sekarang)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                const Text(
+                  'Mustika Ayu Catering',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (onKeluar != null) ...[
+            const SizedBox(width: AppTheme.spacing8),
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: IconButton.outlined(
+                key: const Key('tombol-keluar'),
+                tooltip: 'Keluar',
+                padding: EdgeInsets.zero,
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: const BorderSide(color: AppTheme.garisKartu),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.logout,
+                  size: 18,
+                  color: AppTheme.textSecondary,
+                ),
+                onPressed: onKeluar,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Kartu putih "Kiriman hari ini": jumlah pesanan yang dikirim hari ini
+/// dan menu yang harus disiapkan.
+class _KartuKiriman extends StatelessWidget {
   final DateTime sekarang;
   final List<Pesanan> pesanan;
   final int batas;
   final bool memuat;
-  final VoidCallback? onKeluar;
   final void Function(Pesanan pesanan)? onPesananTap;
 
-  const _PanelHariIni({
+  const _KartuKiriman({
     required this.sekarang,
     required this.pesanan,
     required this.batas,
     required this.memuat,
-    this.onKeluar,
     this.onPesananTap,
   });
 
@@ -192,105 +303,94 @@ class _PanelHariIni extends StatelessWidget {
     });
 
     return Container(
-      color: AppTheme.primaryGelap,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppTheme.marginTepi,
-            AppTheme.spacing12,
-            AppTheme.spacing8,
-            AppTheme.spacing24,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      key: const Key('kartu-kiriman-hari-ini'),
+      decoration: AppTheme.dekorasiKartu,
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${Format.sapaan(sekarang)} · ${Format.tanggalPanjang(sekarang)}',
-                      style: const TextStyle(
-                        fontSize: AppTheme.keterangan,
-                        color: AppTheme.teksPanel,
+              const KotakIkon(
+                ikon: Icons.local_shipping_outlined,
+                warna: AppTheme.primary,
+                latar: AppTheme.primaryMuda,
+                ukuran: 46,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Kiriman hari ini',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.textSecondary,
                       ),
                     ),
-                  ),
-                  if (onKeluar != null)
-                    IconButton(
-                      key: const Key('tombol-keluar'),
-                      tooltip: 'Keluar',
-                      icon: const Icon(Icons.logout, color: AppTheme.teksPanel),
-                      onPressed: onKeluar,
-                    )
-                  else
-                    const SizedBox(height: 48),
-                ],
-              ),
-              const Text(
-                'Mustika Ayu Catering',
-                style: TextStyle(
-                  fontSize: AppTheme.subjudul,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                    const SizedBox(height: 2),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          memuat ? '–' : '${pesanan.length}',
+                          key: const Key('ringkasan-dikirim-hari-ini'),
+                          style: const TextStyle(
+                            fontSize: 28,
+                            height: 1.1,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primary,
+                            fontFeatures: AppTheme.angkaRata,
+                          ),
+                        ),
+                        const SizedBox(width: AppTheme.spacing8),
+                        Expanded(
+                          child: Text(
+                            pesanan.isEmpty
+                                ? 'Tidak ada kiriman hari ini'
+                                : '$porsiHariIni porsi disiapkan',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: AppTheme.spacing24),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    memuat ? '–' : '${pesanan.length}',
-                    key: const Key('ringkasan-dikirim-hari-ini'),
-                    style: const TextStyle(
-                      fontSize: 48,
-                      height: 1,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      fontFeatures: AppTheme.angkaRata,
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.spacing12),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        pesanan.isEmpty
-                            ? 'Tidak ada kiriman hari ini'
-                            : 'Pesanan dikirim hari ini\n$porsiHariIni porsi disiapkan',
-                        style: const TextStyle(
-                          fontSize: AppTheme.isi,
-                          color: AppTheme.teksPanel,
-                          height: 1.3,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (pesanan.isNotEmpty) ...[
-                const SizedBox(height: AppTheme.spacing16),
-                for (final p in pesanan.take(batas))
-                  _BarisKiriman(
-                    pesanan: p,
-                    kunciHariIni: kunciHariIni,
-                    onTap: onPesananTap == null ? null : () => onPesananTap!(p),
-                  ),
-                if (pesanan.length > batas)
-                  Padding(
-                    padding: const EdgeInsets.only(top: AppTheme.spacing8),
-                    child: Text(
-                      '+${pesanan.length - batas} pesanan lain di Daftar Pesanan',
-                      style: const TextStyle(
-                        fontSize: AppTheme.keterangan,
-                        color: AppTheme.teksPanel,
-                      ),
-                    ),
-                  ),
-              ],
             ],
           ),
-        ),
+          if (pesanan.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppTheme.spacing12),
+              child: Divider(color: AppTheme.garisKartu),
+            ),
+            for (final p in pesanan.take(batas))
+              _BarisKiriman(
+                pesanan: p,
+                kunciHariIni: kunciHariIni,
+                onTap: onPesananTap == null ? null : () => onPesananTap!(p),
+              ),
+            if (pesanan.length > batas)
+              Padding(
+                padding: const EdgeInsets.only(top: AppTheme.spacing4),
+                child: Text(
+                  '+${pesanan.length - batas} pesanan lain di Daftar Pesanan',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ),
+          ],
+        ],
       ),
     );
   }
@@ -315,59 +415,48 @@ class _BarisKiriman extends StatelessWidget {
           '${r.namaMenu} ${r.jumlahPorsi}',
     ].join(', ');
 
-    return Padding(
-      padding: const EdgeInsets.only(right: AppTheme.spacing8, bottom: 6),
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.spacing12,
-              vertical: 10,
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.local_shipping_outlined,
-                    size: 18, color: AppTheme.teksPanel),
-                const SizedBox(width: AppTheme.spacing12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        pesanan.namaPelanggan,
-                        style: const TextStyle(
-                          fontSize: AppTheme.isi,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        menu,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: AppTheme.keterangan,
-                          color: AppTheme.teksPanel,
-                        ),
-                      ),
-                    ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    pesanan.namaPelanggan,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
-                ),
-                const Icon(Icons.chevron_right, color: AppTheme.teksPanel),
-              ],
+                  Text(
+                    menu,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            const Icon(Icons.chevron_right, color: AppTheme.textTersier),
+          ],
         ),
       ),
     );
   }
 }
 
-/// Kotak jumlah pesanan satu status pembayaran pada bulan berjalan.
+/// Kartu jumlah pesanan satu status pembayaran pada bulan berjalan.
 class _KotakStatus extends StatelessWidget {
   final StatusPembayaran status;
   final int jumlah;
@@ -376,45 +465,33 @@ class _KotakStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final warna = WarnaStatus.utama(status);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
-      child: ColoredBox(
-        color: AppTheme.latar,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(height: 3, color: warna),
-            Padding(
-              padding: const EdgeInsets.all(AppTheme.spacing12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(WarnaStatus.ikon(status), size: 18, color: warna),
-                  const SizedBox(height: AppTheme.spacing8),
-                  Text(
-                    '$jumlah',
-                    style: const TextStyle(
-                      fontSize: AppTheme.judul,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
-                      fontFeatures: AppTheme.angkaRata,
-                    ),
-                  ),
-                  Text(
-                    status.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: AppTheme.keterangan,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
+    return Container(
+      decoration: AppTheme.dekorasiKartu,
+      padding: const EdgeInsets.all(AppTheme.spacing12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          KotakIkon.status(status),
+          const SizedBox(height: 10),
+          Text(
+            '$jumlah',
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+              fontFeatures: AppTheme.angkaRata,
             ),
-          ],
-        ),
+          ),
+          Text(
+            status.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }
