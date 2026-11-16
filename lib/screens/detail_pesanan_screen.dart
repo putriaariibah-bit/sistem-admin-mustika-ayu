@@ -111,39 +111,37 @@ class DetailPesananScreen extends StatelessWidget {
         }
         return Scaffold(
           backgroundColor: AppTheme.permukaan,
-          appBar: AppBar(
-            title: const Text('Detail Pesanan'),
-            backgroundColor: AppTheme.primaryGelap,
-            foregroundColor: Colors.white,
-            shape: const Border(),
-            titleTextStyle: const TextStyle(
-              fontFamily: AppTheme.fontFamily,
-              fontSize: AppTheme.subjudul,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
+          appBar: AppBar(title: const Text('Detail Pesanan')),
           body: ListView(
             padding: EdgeInsets.zero,
             children: [
-              _KepalaDetail(pesanan: p),
               Center(
                 child: ConstrainedBox(
                   constraints:
                       const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
                   child: Padding(
                     padding: const EdgeInsets.all(AppTheme.marginTepi),
-                    child: _IsiDetail(
-                      pesanan: p,
-                      onBukaNota: () => _bukaNota(context, p),
-                      onUbah: () => _bukaUbah(context, p),
-                      onCatatPembayaran: () => _catatPembayaran(context, p),
-                      onHapus: () => _hapus(context, p),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _KartuRingkasan(pesanan: p),
+                        const SizedBox(height: AppTheme.spacing12),
+                        _IsiDetail(
+                          pesanan: p,
+                          onCatatPembayaran: () =>
+                              _catatPembayaran(context, p),
+                          onHapus: () => _hapus(context, p),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ],
+          ),
+          bottomNavigationBar: _TombolBawah(
+            onUbah: () => _bukaUbah(context, p),
+            onBukaNota: () => _bukaNota(context, p),
           ),
         );
       },
@@ -151,109 +149,172 @@ class DetailPesananScreen extends StatelessWidget {
   }
 }
 
-/// Kepala biru: pelanggan, total tagihan, status, dan progres pembayaran.
-class _KepalaDetail extends StatelessWidget {
+/// Kartu ringkasan di atas Detail: pelanggan, status, total tagihan, dan
+/// progres pembayaran (dibayar dan sisa).
+class _KartuRingkasan extends StatelessWidget {
   final Pesanan pesanan;
 
-  const _KepalaDetail({required this.pesanan});
+  const _KartuRingkasan({required this.pesanan});
 
   @override
   Widget build(BuildContext context) {
     final p = pesanan;
+    final lunas = p.statusPembayaran == StatusPembayaran.lunas;
     final porsiDibayar =
         p.totalTagihan == 0 ? 0.0 : p.totalDibayar / p.totalTagihan;
+    const gayaKecil = TextStyle(
+      fontSize: 12.5,
+      color: AppTheme.textSecondary,
+      fontFeatures: AppTheme.angkaRata,
+    );
+    const gayaNilai = TextStyle(
+      fontWeight: FontWeight.w600,
+      color: AppTheme.textPrimary,
+    );
+
     return Container(
-      color: AppTheme.primaryGelap,
-      padding: const EdgeInsets.fromLTRB(
-        AppTheme.marginTepi,
-        AppTheme.spacing8,
-        AppTheme.marginTepi,
-        AppTheme.spacing24,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
-          child: Column(
+      decoration: AppTheme.dekorasiKartu,
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                p.namaPelanggan,
-                style: const TextStyle(
-                  fontSize: AppTheme.judul,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacing4),
-              Text(
-                'Nota ${Format.tanggal(p.tanggalNota)}, ${p.jenisPesanan.label.toLowerCase()}',
-                style: const TextStyle(
-                  fontSize: AppTheme.keterangan,
-                  color: AppTheme.teksPanel,
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacing24),
-              const Text(
-                'Total tagihan',
-                style: TextStyle(
-                  fontSize: AppTheme.keterangan,
-                  color: AppTheme.teksPanel,
-                ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Text(
-                      Format.rupiah(p.totalTagihan),
-                      key: const Key('total-tagihan'),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p.namaPelanggan,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 32,
+                        fontSize: AppTheme.subjudul,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        fontFeatures: AppTheme.angkaRata,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
-                  ),
-                  StatusBadge(p.statusPembayaran),
-                ],
-              ),
-              const SizedBox(height: AppTheme.spacing12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: porsiDibayar.clamp(0.0, 1.0),
-                  minHeight: 6,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
-                  color: p.statusPembayaran == StatusPembayaran.lunas
-                      ? const Color(0xFF7BC67E)
-                      : Colors.white,
+                    const SizedBox(height: 2),
+                    Text(
+                      'Nota ${Format.tanggal(p.tanggalNota)} · '
+                      '${p.jenisPesanan.label}',
+                      style: gayaKecil,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: AppTheme.spacing8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Dibayar ${Format.rupiah(p.totalDibayar)}',
-                      style: const TextStyle(
-                        fontSize: AppTheme.keterangan,
-                        color: AppTheme.teksPanel,
-                        fontFeatures: AppTheme.angkaRata,
+              const SizedBox(width: AppTheme.spacing8),
+              StatusBadge(p.statusPembayaran),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 14, bottom: 12),
+            child: Divider(color: AppTheme.garisKartu),
+          ),
+          const Text('Total tagihan', style: gayaKecil),
+          const SizedBox(height: 2),
+          Text(
+            Format.rupiah(p.totalTagihan),
+            key: const Key('total-tagihan'),
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.primary,
+              fontFeatures: AppTheme.angkaRata,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacing12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: porsiDibayar.clamp(0.0, 1.0),
+              minHeight: 8,
+              backgroundColor: AppTheme.permukaan,
+              color: lunas ? const Color(0xFF3E8E4A) : AppTheme.primary,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacing8),
+          Row(
+            children: [
+              Expanded(
+                child: Text.rich(
+                  TextSpan(
+                    text: 'Dibayar ',
+                    children: [
+                      TextSpan(
+                        text: Format.rupiah(p.totalDibayar),
+                        style: gayaNilai,
                       ),
-                    ),
+                    ],
                   ),
-                  Text(
-                    'Sisa ${Format.rupiah(p.sisaTagihan)}',
-                    key: const Key('sisa-tagihan'),
-                    style: const TextStyle(
-                      fontSize: AppTheme.keterangan,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      fontFeatures: AppTheme.angkaRata,
+                  style: gayaKecil,
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  text: 'Sisa ',
+                  children: [
+                    TextSpan(
+                      text: Format.rupiah(p.sisaTagihan),
+                      style: gayaNilai,
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                key: const Key('sisa-tagihan'),
+                style: gayaKecil,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tombol Ubah dan Lihat Nota yang selalu terlihat di bawah Detail.
+class _TombolBawah extends StatelessWidget {
+  final VoidCallback onUbah;
+  final VoidCallback onBukaNota;
+
+  const _TombolBawah({required this.onUbah, required this.onBukaNota});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppTheme.garisKartu)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.marginTepi,
+            AppTheme.spacing12,
+            AppTheme.marginTepi,
+            AppTheme.spacing12,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 5,
+                child: OutlinedButton.icon(
+                  key: const Key('ubah-pesanan'),
+                  onPressed: onUbah,
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  label: const Text('Ubah'),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing12 - 2),
+              Expanded(
+                flex: 7,
+                child: FilledButton.icon(
+                  key: const Key('lihat-nota'),
+                  onPressed: onBukaNota,
+                  icon: const Icon(Icons.receipt_long_outlined, size: 20),
+                  label: const Text('Lihat Nota'),
+                ),
               ),
             ],
           ),
@@ -265,15 +326,11 @@ class _KepalaDetail extends StatelessWidget {
 
 class _IsiDetail extends StatelessWidget {
   final Pesanan pesanan;
-  final VoidCallback onBukaNota;
-  final VoidCallback onUbah;
   final VoidCallback onCatatPembayaran;
   final VoidCallback onHapus;
 
   const _IsiDetail({
     required this.pesanan,
-    required this.onBukaNota,
-    required this.onUbah,
     required this.onCatatPembayaran,
     required this.onHapus,
   });
@@ -347,13 +404,26 @@ class _IsiDetail extends StatelessWidget {
           children: [
             for (final kunci in tanggalUrut) ...[
               Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 2),
-                child: Text(
-                  'Kirim ${Format.tanggal(perTanggal[kunci]!.first.tanggalKirim)}',
-                  style: const TextStyle(
-                    fontSize: AppTheme.keterangan,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primary,
+                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryMuda,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      'Kirim ${Format.tanggal(perTanggal[kunci]!.first.tanggalKirim)}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primary,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -421,20 +491,6 @@ class _IsiDetail extends StatelessWidget {
           ikon: Icons.history,
           children: [_RiwayatPerubahan(pesananId: p.id)],
         ),
-        FilledButton.icon(
-          key: const Key('lihat-nota'),
-          onPressed: onBukaNota,
-          icon: const Icon(Icons.receipt_long_outlined, size: 20),
-          label: const Text('Lihat Nota'),
-        ),
-        const SizedBox(height: AppTheme.spacing12),
-        OutlinedButton.icon(
-          key: const Key('ubah-pesanan'),
-          onPressed: onUbah,
-          icon: const Icon(Icons.edit_outlined, size: 20),
-          label: const Text('Ubah Pesanan'),
-        ),
-        const SizedBox(height: AppTheme.spacing12),
         TextButton.icon(
           key: const Key('hapus-pesanan'),
           onPressed: onHapus,
@@ -445,7 +501,7 @@ class _IsiDetail extends StatelessWidget {
           icon: const Icon(Icons.delete_outline, size: 20),
           label: const Text('Hapus Pesanan'),
         ),
-        const SizedBox(height: AppTheme.spacing24),
+        const SizedBox(height: AppTheme.spacing8),
       ],
     );
   }
