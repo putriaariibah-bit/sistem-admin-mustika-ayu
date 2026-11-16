@@ -288,35 +288,42 @@ class _TombolBawah extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppTheme.marginTepi,
-            AppTheme.spacing12,
-            AppTheme.marginTepi,
-            AppTheme.spacing12,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 5,
-                child: OutlinedButton.icon(
-                  key: const Key('ubah-pesanan'),
-                  onPressed: onUbah,
-                  icon: const Icon(Icons.edit_outlined, size: 20),
-                  label: const Text('Ubah'),
-                ),
+        child: Center(
+          heightFactor: 1,
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTheme.marginTepi,
+                AppTheme.spacing12,
+                AppTheme.marginTepi,
+                AppTheme.spacing12,
               ),
-              const SizedBox(width: AppTheme.spacing12 - 2),
-              Expanded(
-                flex: 7,
-                child: FilledButton.icon(
-                  key: const Key('lihat-nota'),
-                  onPressed: onBukaNota,
-                  icon: const Icon(Icons.receipt_long_outlined, size: 20),
-                  label: const Text('Lihat Nota'),
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: OutlinedButton.icon(
+                      key: const Key('ubah-pesanan'),
+                      onPressed: onUbah,
+                      icon: const Icon(Icons.edit_outlined, size: 20),
+                      label: const Text('Ubah'),
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.spacing12 - 2),
+                  Expanded(
+                    flex: 7,
+                    child: FilledButton.icon(
+                      key: const Key('lihat-nota'),
+                      onPressed: onBukaNota,
+                      icon: const Icon(Icons.receipt_long_outlined, size: 20),
+                      label: const Text('Lihat Nota'),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

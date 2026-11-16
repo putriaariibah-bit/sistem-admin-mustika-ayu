@@ -88,7 +88,8 @@ class AppTheme {
   static const Color garisTombol = Color(0xFFC9D2DF);
 
   /// Teks tersier, mis. tanggal nota pada kartu pesanan.
-  static const Color textTersier = Color(0xFF8A93A0);
+  /// Kontras 4,8:1 di atas putih (WCAG AA untuk teks kecil).
+  static const Color textTersier = Color(0xFF6B7280);
 
   /// Kartu putih: sudut 12, garis tipis, bayangan sangat halus.
   static const BoxDecoration dekorasiKartu = BoxDecoration(
