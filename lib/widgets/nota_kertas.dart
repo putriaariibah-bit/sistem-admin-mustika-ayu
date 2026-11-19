@@ -33,6 +33,28 @@ class NotaKertas extends StatelessWidget {
         child: Text(isi, style: gaya, textAlign: rata),
       );
 
+  /// Sel rata kiri yang selalu satu baris, mis. "50 pcs" dan "Kirim
+  /// 23/11/2026"; mengecil bila kolom terlalu sempit.
+  Widget _satuBaris(String isi, TextStyle gaya) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(isi, style: gaya, maxLines: 1, softWrap: false),
+        ),
+      );
+
+  /// Sel nominal: selalu satu baris dan rata kanan, mengecil bila kolom
+  /// terlalu sempit, sehingga angka jutaan tidak terpotong.
+  Widget _angkaSel(String isi) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerRight,
+          child: Text(isi, style: _angka, maxLines: 1, softWrap: false),
+        ),
+      );
+
   /// Sel judul kolom: selalu satu baris, mengecil bila kolom sempit.
   Widget _judulKolom(String isi, {TextAlign rata = TextAlign.left}) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
@@ -47,10 +69,10 @@ class NotaKertas extends StatelessWidget {
 
   TableRow _barisTabel(BarisNota b) => TableRow(
         children: [
-          _sel(b.banyak, _teks),
+          _satuBaris(b.banyak, _teks),
           _sel(b.nama, _teks),
-          _sel(Format.ribuan(b.harga), _angka, rata: TextAlign.right),
-          _sel(Format.ribuan(b.jumlah), _angka, rata: TextAlign.right),
+          _angkaSel(Format.ribuan(b.harga)),
+          _angkaSel(Format.ribuan(b.jumlah)),
         ],
       );
 
@@ -58,7 +80,10 @@ class NotaKertas extends StatelessWidget {
         decoration: const BoxDecoration(color: AppTheme.permukaan),
         children: [
           const SizedBox.shrink(),
-          _sel(isi, _tebal.copyWith(fontSize: 11.5, color: AppTheme.primary)),
+          _satuBaris(
+            isi,
+            _tebal.copyWith(fontSize: 11.5, color: AppTheme.primary),
+          ),
           const SizedBox.shrink(),
           const SizedBox.shrink(),
         ],
@@ -152,10 +177,10 @@ class NotaKertas extends StatelessWidget {
               verticalInside: _garis,
             ),
             columnWidths: const {
-              0: FlexColumnWidth(1.3),
-              1: FlexColumnWidth(2.8),
-              2: FlexColumnWidth(1.5),
-              3: FlexColumnWidth(1.6),
+              0: FlexColumnWidth(1.2),
+              1: FlexColumnWidth(2.4),
+              2: FlexColumnWidth(1.6),
+              3: FlexColumnWidth(1.9),
             },
             defaultVerticalAlignment: TableCellVerticalAlignment.top,
             children: [

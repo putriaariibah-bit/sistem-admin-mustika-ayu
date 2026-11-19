@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -66,8 +68,34 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
-  late final Stream<List<Pesanan>> _streamPesanan =
-      Repositori.instance.pantauPesanan();
+
+  // Data pesanan didengarkan sekali di sini, bukan lewat StreamBuilder di
+  // dalam tata letak. Saat lebar layar berganti (ponsel <-> layar lebar),
+  // posisi halaman di pohon widget ikut berubah; StreamBuilder akan
+  // berlangganan ulang dan data terakhir tidak datang lagi.
+  late final StreamSubscription<List<Pesanan>> _langganan;
+  List<Pesanan> _semua = const [];
+  bool _memuat = true;
+  Object? _galat;
+
+  @override
+  void initState() {
+    super.initState();
+    _langganan = Repositori.instance.pantauPesanan().listen(
+      (data) => setState(() {
+        _semua = data;
+        _memuat = false;
+        _galat = null;
+      }),
+      onError: (Object e) => setState(() => _galat = e),
+    );
+  }
+
+  @override
+  void dispose() {
+    _langganan.cancel();
+    super.dispose();
+  }
 
   void _pilihTab(int index) => setState(() => _currentIndex = index);
 
@@ -103,46 +131,41 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     final lebar = AppTheme.layarLebar(context);
 
-    final halaman = StreamBuilder<List<Pesanan>>(
-      stream: _streamPesanan,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Scaffold(
-            body: EmptyState(
-              icon: Icons.cloud_off_outlined,
-              title: 'Data tidak dapat dimuat',
-              subtitle: '${snapshot.error}',
-            ),
-          );
-        }
-        final semua = snapshot.data ?? const <Pesanan>[];
-        final memuat = !snapshot.hasData;
-        return IndexedStack(
-          index: _currentIndex,
-          children: [
-            DashboardScreen(
-              semua: semua,
-              memuat: memuat,
-              onLihatSemua: () => _pilihTab(1),
-              onPesananTap: _bukaDetailPesanan,
-              onTambah: _bukaFormTambah,
-              onKeluar: widget.onKeluar,
-            ),
-            DaftarPesananScreen(
-              semua: semua,
-              memuat: memuat,
-              onPesananTap: _bukaDetailPesanan,
-              onTambah: _bukaFormTambah,
-            ),
-            RekapScreen(
-              semua: semua,
-              memuat: memuat,
-              onPesananTap: _bukaDetailPesanan,
-            ),
-          ],
-        );
-      },
-    );
+    final Widget halaman;
+    if (_galat != null) {
+      halaman = Scaffold(
+        body: EmptyState(
+          icon: Icons.cloud_off_outlined,
+          title: 'Data tidak dapat dimuat',
+          subtitle: '$_galat',
+        ),
+      );
+    } else {
+      halaman = IndexedStack(
+        index: _currentIndex,
+        children: [
+          DashboardScreen(
+            semua: _semua,
+            memuat: _memuat,
+            onLihatSemua: () => _pilihTab(1),
+            onPesananTap: _bukaDetailPesanan,
+            onTambah: _bukaFormTambah,
+            onKeluar: widget.onKeluar,
+          ),
+          DaftarPesananScreen(
+            semua: _semua,
+            memuat: _memuat,
+            onPesananTap: _bukaDetailPesanan,
+            onTambah: _bukaFormTambah,
+          ),
+          RekapScreen(
+            semua: _semua,
+            memuat: _memuat,
+            onPesananTap: _bukaDetailPesanan,
+          ),
+        ],
+      );
+    }
 
     if (lebar) {
       return Scaffold(
