@@ -34,7 +34,7 @@ void main() {
     expect(aktif.color, AppTheme.primaryMuda);
   });
 
-  testWidgets('Judul kolom Banyak pada nota tetap satu baris di 375 px',
+  testWidgets('Judul kolom BANYAK pada nota tetap satu baris di 375 px',
       (tester) async {
     tester.view.physicalSize = const Size(375, 812);
     tester.view.devicePixelRatio = 1;
@@ -43,7 +43,7 @@ void main() {
       theme: AppTheme.light,
       home: NotaScreen(pesanan: pesananUji()),
     ));
-    final tinggi = tester.getSize(find.text('Banyak')).height;
+    final tinggi = tester.getSize(find.text('BANYAK')).height;
     expect(tinggi, lessThan(20));
   });
 }

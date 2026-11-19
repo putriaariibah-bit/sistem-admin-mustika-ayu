@@ -1,3 +1,4 @@
+import '../utils/format.dart';
 import 'konversi.dart';
 import 'pesanan.dart';
 import 'rincian_menu.dart';
@@ -39,6 +40,9 @@ class Nota {
 
   final DateTime tanggalNota;
   final String namaPelanggan;
+
+  /// Jenis pesanan, mis. "Sekaligus" atau "Langganan harian".
+  final String jenis;
   final List<KelompokNota> menu;
   final List<BarisNota> ongkosKirim;
 
@@ -51,6 +55,7 @@ class Nota {
   const Nota({
     required this.tanggalNota,
     required this.namaPelanggan,
+    required this.jenis,
     required this.menu,
     required this.ongkosKirim,
     required this.jumlahRp,
@@ -75,6 +80,7 @@ class Nota {
     return Nota(
       tanggalNota: p.tanggalNota,
       namaPelanggan: p.namaPelanggan,
+      jenis: p.jenisPesanan.label,
       menu: [
         for (final daftar in kelompok.values)
           KelompokNota(
@@ -115,6 +121,21 @@ class Nota {
       (menu.length == 1 &&
           Konversi.kunciTanggal(menu.first.tanggalKirim) !=
               Konversi.kunciTanggal(tanggalNota));
+
+  /// Tanggal kirim untuk kotak informasi pesanan: satu tanggal, mis.
+  /// `03/11/2026`, atau rentang tanggal pertama sampai terakhir, mis.
+  /// `09/11 – 10/11/2026`.
+  String get teksTanggalKirim {
+    if (menu.isEmpty) return Format.tanggalAngka(tanggalNota);
+    final awal = menu.first.tanggalKirim;
+    final akhir = menu.last.tanggalKirim;
+    if (menu.length == 1) return Format.tanggalAngka(awal);
+    String dua(int n) => n.toString().padLeft(2, '0');
+    final teksAwal = awal.year == akhir.year
+        ? '${dua(awal.day)}/${dua(awal.month)}'
+        : Format.tanggalAngka(awal);
+    return '$teksAwal – ${Format.tanggalAngka(akhir)}';
+  }
 
   /// Jumlah kolom Jumlah pada seluruh baris menu (sama dengan total menu).
   int get totalMenu => menu.fold(
