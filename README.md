@@ -52,6 +52,28 @@ dan kasus uji Black Box BB-01 sampai BB-25.
   pada bulan itu. Ongkos kirim dicatat di nota, tetapi tidak dihitung sebagai
   pendapatan.
 
+## Tampilan
+
+Tangkapan layar versi web di Chrome dengan ukuran layar ponsel (375 × 812)
+dan data uji.
+
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/dashboard.png" width="220" alt="Dashboard"><br>Dashboard</td>
+    <td align="center"><img src="screenshots/daftar-pesanan.png" width="220" alt="Daftar Pesanan"><br>Daftar Pesanan</td>
+    <td align="center"><img src="screenshots/form-tambah-pesanan.png" width="220" alt="Form Tambah Pesanan"><br>Form Tambah Pesanan</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/detail-pesanan.png" width="220" alt="Detail Pesanan"><br>Detail Pesanan</td>
+    <td align="center"><img src="screenshots/nota.png" width="220" alt="Nota"><br>Nota</td>
+    <td align="center"><img src="screenshots/rekap.png" width="220" alt="Rekap Bulanan"><br>Rekap Bulanan</td>
+  </tr>
+</table>
+
+Pada layar lebar (600 px ke atas), menu pindah ke sidebar kiri:
+
+![Dashboard pada layar lebar](screenshots/dashboard-layar-lebar.png)
+
 ## Teknologi
 
 - Flutter 3.47.7 dan Dart 3.13.5
