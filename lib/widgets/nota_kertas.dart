@@ -142,7 +142,7 @@ class NotaKertas extends StatelessWidget {
           ),
           const SizedBox(width: AppTheme.spacing8),
           // Badge boleh mengecil agar tidak meluber di layar sempit.
-          Flexible(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
