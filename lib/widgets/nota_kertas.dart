@@ -141,15 +141,22 @@ class NotaKertas extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppTheme.spacing8),
+          // Badge boleh mengecil agar tidak meluber di layar sempit.
           Flexible(
-            child: Wrap(
-              alignment: WrapAlignment.end,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 6,
-              runSpacing: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('Status Pembayaran:', style: _redup),
-                StatusBadge(nota.status),
+                Text(
+                  'Status Pembayaran:',
+                  style: _redup,
+                  textAlign: TextAlign.right,
+                ),
+                const SizedBox(height: 4),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: StatusBadge(nota.status),
+                ),
               ],
             ),
           ),
