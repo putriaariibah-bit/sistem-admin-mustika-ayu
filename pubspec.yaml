@@ -40,6 +40,7 @@ dependencies:
   # Nota (KF-08): simpan gambar ke Galeri dan buka menu berbagi.
   gal: ^3.0.1
   share_plus: ^13.3.1
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:
