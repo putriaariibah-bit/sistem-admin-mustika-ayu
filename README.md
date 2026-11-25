@@ -85,15 +85,20 @@ Pada layar lebar (600 px ke atas), menu pindah ke sidebar kiri:
 
 ## Struktur data Cloud Firestore
 
-| Collection | Isi |
+Setiap akun punya dokumen usahanya sendiri, dan semua data akun itu berada
+di bawahnya:
+
+| Lokasi | Isi |
 |---|---|
-| `pelanggan` | Satu dokumen per pelanggan, berisi field `nama`. |
-| `pesanan` | Satu dokumen per pesanan: rujukan dan salinan nama pelanggan, tanggal nota, jenis pesanan, array `rincian`, `ongkosKirim`, dan `pembayaran`, serta total dan status yang dihitung dari isinya. |
-| `pesanan/{id}/riwayat` | Riwayat perubahan pesanan: waktu, bagian, nilai lama, dan nilai baru. |
+| `usaha/{uid}` | Profil usaha: `nama`, `alamat`, `whatsapp`, dan `logo` (gambar base64, boleh kosong). |
+| `usaha/{uid}/pelanggan` | Satu dokumen per pelanggan, berisi field `nama`. |
+| `usaha/{uid}/pesanan` | Satu dokumen per pesanan: rujukan dan salinan nama pelanggan, tanggal nota, jenis pesanan, array `rincian`, `ongkosKirim`, dan `pembayaran`, total dan status yang dihitung dari isinya, serta `dibuatPada` dan `diubahPada`. |
+| `usaha/{uid}/pesanan/{id}/riwayat` | Riwayat perubahan pesanan: waktu, bagian, nilai lama, dan nilai baru. |
 
 Rekap bulanan tidak disimpan sebagai collection; aplikasi menghitungnya dari
-dokumen pesanan menurut tanggal nota. Security Rules hanya mengizinkan akses
-bagi pengguna yang sudah masuk.
+dokumen pesanan menurut tanggal nota. Security Rules (`firestore.rules`)
+hanya mengizinkan akun membaca dan menulis dokumen `usaha/{uid}` miliknya
+sendiri beserta isinya.
 
 ## Struktur folder
 
@@ -145,3 +150,29 @@ Kasus BB-04, BB-05, BB-14, BB-21, dan BB-25, beserta User Acceptance Testing
 oleh pemilik, diuji langsung pada aplikasi dan hasilnya dilaporkan di Bab V
 skripsi. File uji lainnya memeriksa tampilan, misalnya teks panjang dan
 layar ponsel sempit tidak meluber.
+
+### Pemetaan CRUD
+
+| Operasi | Di aplikasi | Di Firestore |
+|---|---|---|
+| Create | Tambah Pesanan, tambah pelanggan, isi Profil Usaha | `add()` pada `pesanan`/`pelanggan`; `set(merge)` pada profil |
+| Read | Dashboard, Daftar Pesanan (cari dan saringan), Detail, Rekap, Nota | `snapshots()` (diperbarui langsung) |
+| Update | Ubah Pesanan (formulir yang sama dalam mode ubah), Catat Pembayaran, ubah nama pelanggan, ubah Profil Usaha | `update()`, sehingga `dibuatPada` tetap; setiap perubahan pesanan dicatat di `riwayat` |
+| Delete | Hapus Pesanan lewat dialog konfirmasi | `delete()` pada pesanan beserta seluruh `riwayat`-nya (satu batch) |
+
+### Tabel uji CRUD
+
+Kolom hasil yang diharapkan diisi sebelum pengujian; kolom hasil nyata diisi
+setelah mencoba langsung di Chrome (`https://mustika-ayu-catering.web.app`
+atau `localhost`) dan melihat dokumennya di Firebase Console.
+
+| No | Kasus uji | Hasil yang diharapkan | Hasil nyata |
+|---|---|---|---|
+| 1 | Tambah pesanan dengan data valid | Muncul pesan "Pesanan baru berhasil disimpan"; pesanan tampil di Daftar Pesanan dan dokumen baru ada di `usaha/{uid}/pesanan` dengan `dibuatPada` terisi | |
+| 2 | Tambah pesanan tanpa rincian menu | Ditolak dengan pesan rincian menu wajib diisi; tidak ada dokumen baru | |
+| 3 | Ubah porsi atau harga pesanan yang sudah ada | Muncul pesan "Perubahan pesanan disimpan"; total ikut berubah, `dibuatPada` tetap, `diubahPada` berganti, dan perubahan tercatat di Riwayat perubahan | |
+| 4 | Catat pembayaran yang melebihi sisa tagihan | Ditolak dengan pesan nominal melebihi sisa tagihan; data pembayaran tidak berubah | |
+| 5 | Hapus pesanan lalu tekan Batal pada dialog | Dialog tertutup; pesanan dan dokumennya tetap ada | |
+| 6 | Hapus pesanan lalu tekan Hapus pada dialog | Muncul pesan "Pesanan dihapus"; pesanan hilang dari Daftar Pesanan, dokumen dan subkoleksi `riwayat`-nya hilang dari Firestore | |
+| 7 | Masuk dengan akun lain, lalu lihat Daftar Pesanan | Pesanan milik akun pertama tidak tampil; data tiap akun terpisah | |
+| 8 | Membaca dokumen `usaha/{uid}` milik akun lain (mis. lewat Rules Playground di Console) | Ditolak dengan `permission-denied` oleh Security Rules | |

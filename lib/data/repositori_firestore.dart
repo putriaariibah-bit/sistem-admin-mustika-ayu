@@ -125,8 +125,13 @@ class RepositoriFirestore implements Repositori {
     if (riwayat.isEmpty) return;
 
     final ref = _pesanan.doc(lama.id);
+    // update() hanya menulis field yang disebut, sehingga field audit
+    // dibuatPada tidak tersentuh. Bila dokumen sudah dihapus, update()
+    // gagal (not-found) dan perubahan tidak membuat dokumen baru.
+    final data = _keDokumen(baru.copyWith(diubahPada: sekarang))
+      ..remove('dibuatPada');
     final batch = _db.batch();
-    batch.set(ref, _keDokumen(baru.copyWith(diubahPada: sekarang)));
+    batch.update(ref, data);
     for (final r in riwayat) {
       batch.set(ref.collection('riwayat').doc(), r.toMap());
     }
