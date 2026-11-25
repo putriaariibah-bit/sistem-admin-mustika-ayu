@@ -27,6 +27,10 @@ class NotaKertas extends StatelessWidget {
 
   const NotaKertas({super.key, required this.nota, this.profil});
 
+  /// Lebar kertas nota (piksel logis). Layar Nota menyusun nota pada lebar
+  /// ini lalu memperkecilnya agar muat di layar ponsel.
+  static const double lebarKertas = 420;
+
   /// Profil yang benar-benar diisi pemilik, atau null bila belum ada.
   ProfilUsaha? get _profilDiisi {
     final p = profil ?? ProfilUsaha.aktif.value;

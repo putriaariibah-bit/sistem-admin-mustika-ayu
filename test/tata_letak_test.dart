@@ -6,6 +6,7 @@ import 'package:kelola_katering/data/repositori_memori.dart';
 import 'package:kelola_katering/main.dart';
 import 'package:kelola_katering/models/rincian_menu.dart';
 import 'package:kelola_katering/screens/nota_screen.dart';
+import 'package:kelola_katering/widgets/nota_kertas.dart';
 import 'package:kelola_katering/utils/theme.dart';
 
 import 'data_uji.dart';
@@ -65,5 +66,34 @@ void main() {
         reason: teks,
       );
     }
+  });
+
+  testWidgets('Nota tetap selebar kertas di ponsel kecil dengan huruf besar', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        builder: (context, anak) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.6)),
+          child: anak!,
+        ),
+        home: NotaScreen(pesanan: pesananUji()),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    // Disusun selebar kertas, lalu diperkecil agar muat di layar 320 px.
+    final kertas = tester.renderObject<RenderBox>(find.byType(NotaKertas));
+    expect(kertas.size.width, NotaKertas.lebarKertas);
+    expect(tester.getRect(find.byType(NotaKertas)).width, lessThan(320));
+    // Ukuran huruf ponsel tidak membuat tanggal nota turun baris.
+    expect(tester.getSize(find.byKey(const Key('nota-tanggal'))).height,
+        lessThan(20));
   });
 }

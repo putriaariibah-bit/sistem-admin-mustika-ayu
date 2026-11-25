@@ -74,19 +74,28 @@ class _NotaScreenState extends State<NotaScreen> {
       appBar: AppBar(title: const Text('Nota')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.marginTepi),
+        // Nota selalu disusun selebar kertas tetap tanpa mengikuti ukuran
+        // huruf ponsel, lalu diperkecil agar muat di layar. Dengan begitu
+        // susunannya sama di semua ponsel dan pada berkas gambarnya.
         child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: AppTheme.garis),
-                borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
-                child: RepaintBoundary(
-                  key: _kunciNota,
-                  child: NotaKertas(nota: _nota),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: NotaKertas.lebarKertas,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppTheme.garis),
+                  borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
+                  child: RepaintBoundary(
+                    key: _kunciNota,
+                    child: MediaQuery.withNoTextScaling(
+                      child: NotaKertas(nota: _nota),
+                    ),
+                  ),
                 ),
               ),
             ),
