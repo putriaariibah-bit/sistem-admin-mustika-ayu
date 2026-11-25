@@ -5,6 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:gal/gal.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../models/profil_usaha.dart';
+
 /// Aksi terhadap berkas nota: simpan atau bagikan.
 typedef AksiNota = Future<void> Function(Uint8List png, String namaBerkas);
 
@@ -44,7 +46,11 @@ class IzinGaleriDitolak implements Exception {
 /// Implementasi di perangkat: Android menyimpan ke Galeri (album
 /// [album]); versi web mengunduh berkasnya.
 class BerkasNotaPerangkat implements BerkasNota {
-  static const String album = 'Mustika Ayu Catering';
+  /// Nama album mengikuti nama usaha pada profil.
+  static String get album {
+    final profil = ProfilUsaha.aktif.value;
+    return profil.lengkap ? profil.nama.trim() : ProfilUsaha.bawaan.nama;
+  }
 
   @override
   Future<void> simpan(Uint8List png, String namaBerkas) async {

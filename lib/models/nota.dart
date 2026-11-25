@@ -33,11 +33,6 @@ class KelompokNota {
 /// ulang dari dokumen pesanan, sehingga rincian, ongkos kirim, dan total
 /// selalu sama dengan data pesanan (BB-19).
 class Nota {
-  /// Identitas usaha, disalin dari kepala nota kertas Mustika Ayu Catering.
-  static const String namaUsaha = 'Mustika Ayu Catering';
-  static const String alamatUsaha = 'Jl. Kendeng II No. 4 Semarang';
-  static const String whatsappUsaha = '08112921703';
-
   final DateTime tanggalNota;
   final String namaPelanggan;
 

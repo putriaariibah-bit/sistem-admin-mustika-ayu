@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/profil_usaha.dart';
 import '../utils/theme.dart';
 import 'logo_usaha.dart';
 
@@ -18,11 +19,15 @@ class SidebarMenu extends StatelessWidget {
   /// Dipanggil saat menu Keluar ditekan. Jika null, menu disembunyikan.
   final VoidCallback? onKeluar;
 
+  /// Dipanggil saat menu Profil Usaha ditekan. Jika null, disembunyikan.
+  final VoidCallback? onProfil;
+
   const SidebarMenu({
     super.key,
     required this.indeksAktif,
     required this.onPilih,
     this.onKeluar,
+    this.onProfil,
   });
 
   @override
@@ -40,29 +45,37 @@ class SidebarMenu extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
                   AppTheme.spacing4,
                   AppTheme.spacing8,
                   AppTheme.spacing4,
                   AppTheme.spacing24,
                 ),
-                child: Row(
-                  children: [
-                    LogoUsaha(ukuran: 40),
-                    SizedBox(width: AppTheme.spacing12 - 2),
-                    Expanded(
-                      child: Text(
-                        'Mustika Ayu Catering',
-                        style: TextStyle(
-                          fontSize: 15,
-                          height: 1.25,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.primary,
+                child: ValueListenableBuilder<ProfilUsaha>(
+                  valueListenable: ProfilUsaha.aktif,
+                  builder: (context, profil, _) => Row(
+                    children: [
+                      LogoUsaha(
+                        ukuran: 40,
+                        profil: profil.lengkap ? profil : null,
+                      ),
+                      const SizedBox(width: AppTheme.spacing12 - 2),
+                      Expanded(
+                        child: Text(
+                          profil.lengkap
+                              ? profil.nama.trim()
+                              : ProfilUsaha.bawaan.nama,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            height: 1.25,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primary,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               _ItemMenu(
@@ -88,8 +101,18 @@ class SidebarMenu extends StatelessWidget {
                 aktif: indeksAktif == 2,
                 onTap: () => onPilih(2),
               ),
+              const Spacer(),
+              if (onProfil != null) ...[
+                _ItemMenu(
+                  key: const Key('nav-profil-usaha'),
+                  ikon: Icons.storefront_outlined,
+                  label: 'Profil Usaha',
+                  aktif: false,
+                  onTap: onProfil!,
+                ),
+                const SizedBox(height: AppTheme.spacing4),
+              ],
               if (onKeluar != null) ...[
-                const Spacer(),
                 _ItemMenu(
                   key: const Key('tombol-keluar'),
                   ikon: Icons.logout,

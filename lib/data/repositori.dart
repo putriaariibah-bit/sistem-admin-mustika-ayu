@@ -1,5 +1,6 @@
 import '../models/pelanggan.dart';
 import '../models/pesanan.dart';
+import '../models/profil_usaha.dart';
 import '../models/riwayat_perubahan.dart';
 import 'repositori_firestore.dart';
 
@@ -14,6 +15,12 @@ abstract class Repositori {
   /// Repositori yang sedang dipakai. Dibuat saat pertama kali diakses.
   static Repositori get instance => _instance ??= RepositoriFirestore();
   static set instance(Repositori repositori) => _instance = repositori;
+
+  // ── Profil usaha (pengembangan lanjutan, di luar Bab III) ────
+  /// Profil usaha akun yang sedang masuk; null bila belum pernah diisi.
+  Stream<ProfilUsaha?> pantauProfil();
+
+  Future<void> simpanProfil(ProfilUsaha profil);
 
   // ── Pelanggan (proses 2.0, KF-02) ────────────────────────────
   Stream<List<Pelanggan>> pantauPelanggan();

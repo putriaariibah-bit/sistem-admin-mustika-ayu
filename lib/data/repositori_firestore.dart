@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/aturan_pesanan.dart';
 import '../models/pelanggan.dart';
 import '../models/pesanan.dart';
+import '../models/profil_usaha.dart';
 import '../models/riwayat_perubahan.dart';
 import 'repositori.dart';
 
@@ -11,13 +13,40 @@ import 'repositori.dart';
 /// - koleksi `pesanan` (struktur Tabel 3.8), dengan rincian menu,
 ///   ongkos kirim, dan pembayaran sebagai array berisi map;
 /// - subkoleksi `riwayat` di bawah setiap dokumen pesanan.
+///
+/// Agar aplikasi dapat dipakai lebih dari satu pemilik, seluruh koleksi
+/// itu diletakkan di bawah dokumen `usaha/{uid}` milik akun yang sedang
+/// masuk. Dokumen `usaha/{uid}` sendiri menyimpan profil usaha. Aturan
+/// keamanan Firestore hanya mengizinkan akun membaca dan menulis
+/// dokumen usahanya sendiri.
 class RepositoriFirestore implements Repositori {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  /// Dokumen usaha milik akun yang sedang masuk.
+  DocumentReference<Map<String, dynamic>> get _usaha {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) throw StateError('Belum ada akun yang masuk.');
+    return _db.collection('usaha').doc(uid);
+  }
+
   CollectionReference<Map<String, dynamic>> get _pelanggan =>
-      _db.collection('pelanggan');
+      _usaha.collection('pelanggan');
   CollectionReference<Map<String, dynamic>> get _pesanan =>
-      _db.collection('pesanan');
+      _usaha.collection('pesanan');
+
+  // ── Profil usaha ─────────────────────────────────────────────
+
+  @override
+  Stream<ProfilUsaha?> pantauProfil() => _usaha.snapshots().map((d) {
+        final data = d.data();
+        return data == null ? null : ProfilUsaha.fromMap(data);
+      });
+
+  @override
+  Future<void> simpanProfil(ProfilUsaha profil) => _usaha.set(
+        {...profil.toMap(), 'diperbarui': FieldValue.serverTimestamp()},
+        SetOptions(merge: true),
+      );
 
   // ── Pelanggan ────────────────────────────────────────────────
 

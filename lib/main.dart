@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'data/repositori.dart';
 import 'firebase_options.dart';
 import 'models/pesanan.dart';
+import 'models/profil_usaha.dart';
 import 'screens/cek_status_login.dart';
 import 'screens/daftar_pesanan_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/detail_pesanan_screen.dart';
 import 'screens/form_pesanan_screen.dart';
+import 'screens/profil_usaha_screen.dart';
 import 'screens/rekap_screen.dart';
 import 'utils/theme.dart';
 import 'widgets/empty_state.dart';
@@ -117,6 +119,16 @@ class _HomeShellState extends State<HomeShell> {
     }
   }
 
+  Future<void> _bukaProfil() async {
+    final tersimpan = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfilUsahaScreen(awal: ProfilUsaha.aktif.value),
+      ),
+    );
+    if (mounted && tersimpan == true) _tampilkanPesan('Profil usaha disimpan.');
+  }
+
   Future<void> _bukaFormTambah() async {
     final berhasil = await Navigator.push<bool>(
       context,
@@ -151,6 +163,7 @@ class _HomeShellState extends State<HomeShell> {
             onPesananTap: _bukaDetailPesanan,
             onTambah: _bukaFormTambah,
             onKeluar: widget.onKeluar,
+            onProfil: _bukaProfil,
           ),
           DaftarPesananScreen(
             semua: _semua,
@@ -175,6 +188,7 @@ class _HomeShellState extends State<HomeShell> {
               indeksAktif: _currentIndex,
               onPilih: _pilihTab,
               onKeluar: widget.onKeluar,
+              onProfil: _bukaProfil,
             ),
             Expanded(child: halaman),
           ],

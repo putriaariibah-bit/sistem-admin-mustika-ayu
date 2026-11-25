@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/aturan_pesanan.dart';
 import '../models/konversi.dart';
 import '../models/pesanan.dart';
+import '../models/profil_usaha.dart';
 import '../utils/format.dart';
 import '../utils/theme.dart';
 import '../widgets/empty_state.dart';
@@ -35,6 +36,10 @@ class DashboardScreen extends StatelessWidget {
   /// Tombol Keluar di kepala halaman (ponsel). Jika null, disembunyikan.
   final VoidCallback? onKeluar;
 
+  /// Tombol Profil Usaha di kepala halaman (ponsel). Jika null,
+  /// disembunyikan.
+  final VoidCallback? onProfil;
+
   const DashboardScreen({
     super.key,
     required this.semua,
@@ -43,6 +48,7 @@ class DashboardScreen extends StatelessWidget {
     this.onPesananTap,
     this.onTambah,
     this.onKeluar,
+    this.onProfil,
   });
 
   @override
@@ -69,6 +75,7 @@ class DashboardScreen extends StatelessWidget {
             _KepalaDashboard(
               sekarang: sekarang,
               onKeluar: lebar ? null : onKeluar,
+              onProfil: lebar ? null : onProfil,
             ),
             const SizedBox(height: AppTheme.spacing16),
             _KartuKiriman(
@@ -206,16 +213,48 @@ class DashboardScreen extends StatelessWidget {
 class _KepalaDashboard extends StatelessWidget {
   final DateTime sekarang;
   final VoidCallback? onKeluar;
+  final VoidCallback? onProfil;
 
-  const _KepalaDashboard({required this.sekarang, this.onKeluar});
+  const _KepalaDashboard({
+    required this.sekarang,
+    this.onKeluar,
+    this.onProfil,
+  });
+
+  Widget _tombolKepala({
+    required Key key,
+    required String tooltip,
+    required IconData ikon,
+    required VoidCallback onPressed,
+  }) =>
+      SizedBox(
+        width: 40,
+        height: 40,
+        child: IconButton.outlined(
+          key: key,
+          tooltip: tooltip,
+          padding: EdgeInsets.zero,
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            side: const BorderSide(color: AppTheme.garisKartu),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
+            ),
+          ),
+          icon: Icon(ikon, size: 18, color: AppTheme.textSecondary),
+          onPressed: onPressed,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false,
-      child: Row(
+      child: ValueListenableBuilder<ProfilUsaha>(
+        valueListenable: ProfilUsaha.aktif,
+        builder: (context, profil, _) => Row(
         children: [
-          const LogoUsaha(),
+          LogoUsaha(profil: profil.lengkap ? profil : null),
           const SizedBox(width: AppTheme.spacing12),
           Expanded(
             child: Column(
@@ -231,11 +270,13 @@ class _KepalaDashboard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 1),
-                const Text(
-                  'Mustika Ayu Catering',
+                Text(
+                  profil.lengkap
+                      ? profil.nama.trim()
+                      : ProfilUsaha.bawaan.nama,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primary,
@@ -244,32 +285,26 @@ class _KepalaDashboard extends StatelessWidget {
               ],
             ),
           ),
+          if (onProfil != null) ...[
+            const SizedBox(width: AppTheme.spacing8),
+            _tombolKepala(
+              key: const Key('tombol-profil-usaha'),
+              tooltip: 'Profil usaha',
+              ikon: Icons.storefront_outlined,
+              onPressed: onProfil!,
+            ),
+          ],
           if (onKeluar != null) ...[
             const SizedBox(width: AppTheme.spacing8),
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: IconButton.outlined(
-                key: const Key('tombol-keluar'),
-                tooltip: 'Keluar',
-                padding: EdgeInsets.zero,
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  side: const BorderSide(color: AppTheme.garisKartu),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
-                  ),
-                ),
-                icon: const Icon(
-                  Icons.logout,
-                  size: 18,
-                  color: AppTheme.textSecondary,
-                ),
-                onPressed: onKeluar,
-              ),
+            _tombolKepala(
+              key: const Key('tombol-keluar'),
+              tooltip: 'Keluar',
+              ikon: Icons.logout,
+              onPressed: onKeluar!,
             ),
           ],
         ],
+      ),
       ),
     );
   }

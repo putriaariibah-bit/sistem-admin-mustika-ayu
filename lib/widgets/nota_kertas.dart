@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/nota.dart';
+import '../models/profil_usaha.dart';
 import '../utils/format.dart';
 import '../utils/theme.dart';
 import 'logo_usaha.dart';
@@ -19,7 +20,20 @@ import 'status_badge.dart';
 class NotaKertas extends StatelessWidget {
   final Nota nota;
 
-  const NotaKertas({super.key, required this.nota});
+  /// Identitas usaha di kepala nota. Bawaannya profil akun yang sedang
+  /// masuk ([ProfilUsaha.aktif]); bila belum ada, identitas Mustika Ayu
+  /// Catering dengan logo dari aset.
+  final ProfilUsaha? profil;
+
+  const NotaKertas({super.key, required this.nota, this.profil});
+
+  /// Profil yang benar-benar diisi pemilik, atau null bila belum ada.
+  ProfilUsaha? get _profilDiisi {
+    final p = profil ?? ProfilUsaha.aktif.value;
+    return p.lengkap ? p : null;
+  }
+
+  ProfilUsaha get _identitas => _profilDiisi ?? ProfilUsaha.bawaan;
 
   static const _teks = TextStyle(
     fontFamily: AppTheme.fontFamily,
@@ -73,43 +87,46 @@ class NotaKertas extends StatelessWidget {
         ),
       );
 
-  Widget _kepala() => Column(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            padding: const EdgeInsets.all(9),
-            decoration: const BoxDecoration(
-              color: AppTheme.primaryMuda,
-              shape: BoxShape.circle,
-            ),
-            child: Image.asset(LogoUsaha.aset, fit: BoxFit.contain),
+  Widget _kepala() {
+    final usaha = _identitas;
+    final redupKecil = _redup.copyWith(fontSize: 11.5);
+    return Column(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          padding: const EdgeInsets.all(9),
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            color: AppTheme.primaryMuda,
+            shape: BoxShape.circle,
           ),
-          const SizedBox(height: 6),
+          child: GambarLogo(profil: _profilDiisi, ukuranHuruf: 18),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          usaha.nama,
+          textAlign: TextAlign.center,
+          style: _tebal.copyWith(
+            fontSize: 19,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.primary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        if (usaha.alamat.isNotEmpty)
+          Text(usaha.alamat, textAlign: TextAlign.center, style: redupKecil),
+        if (usaha.whatsapp.isNotEmpty)
           Text(
-            Nota.namaUsaha,
+            'WA: ${_nomorWa(usaha.whatsapp)}',
             textAlign: TextAlign.center,
-            style: _tebal.copyWith(
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
-              color: AppTheme.primary,
-            ),
+            style: redupKecil,
           ),
-          const SizedBox(height: 2),
-          Text(
-            Nota.alamatUsaha,
-            textAlign: TextAlign.center,
-            style: _redup.copyWith(fontSize: 11.5),
-          ),
-          Text(
-            'WA: ${_nomorWa(Nota.whatsappUsaha)}',
-            textAlign: TextAlign.center,
-            style: _redup.copyWith(fontSize: 11.5),
-          ),
-          const SizedBox(height: 14),
-          Container(height: 2, color: AppTheme.primary),
-        ],
-      );
+        const SizedBox(height: 14),
+        Container(height: 2, color: AppTheme.primary),
+      ],
+    );
+  }
 
   Widget _judulNota() => Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,7 +397,7 @@ class NotaKertas extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'Terima kasih atas pesanan Anda di ${Nota.namaUsaha}.',
+              'Terima kasih atas pesanan Anda di ${_identitas.nama}.',
               textAlign: TextAlign.center,
               style: _teks.copyWith(fontWeight: FontWeight.w600),
             ),

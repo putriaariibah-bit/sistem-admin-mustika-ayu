@@ -3,6 +3,7 @@ import 'dart:async';
 import '../models/aturan_pesanan.dart';
 import '../models/pelanggan.dart';
 import '../models/pesanan.dart';
+import '../models/profil_usaha.dart';
 import '../models/riwayat_perubahan.dart';
 import 'repositori.dart';
 
@@ -11,6 +12,7 @@ import 'repositori.dart';
 /// Perilakunya sama dengan [Repositori] lain, tetapi data hilang saat
 /// aplikasi ditutup dan tidak menghubungi Firebase.
 class RepositoriMemori implements Repositori {
+  ProfilUsaha? _profil;
   final List<Pelanggan> _pelanggan = [];
   final List<Pesanan> _pesanan = [];
   final Map<String, List<RiwayatPerubahan>> _riwayat = {};
@@ -25,6 +27,15 @@ class RepositoriMemori implements Repositori {
   }
 
   void _kabari() => _berubah.add(null);
+
+  @override
+  Stream<ProfilUsaha?> pantauProfil() => _pantau(() => _profil);
+
+  @override
+  Future<void> simpanProfil(ProfilUsaha profil) async {
+    _profil = profil;
+    _kabari();
+  }
 
   @override
   Stream<List<Pelanggan>> pantauPelanggan() => _pantau(() =>
