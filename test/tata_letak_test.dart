@@ -11,8 +11,9 @@ import 'package:kelola_katering/utils/theme.dart';
 import 'data_uji.dart';
 
 void main() {
-  testWidgets('Data tetap tampil saat layar berganti dari ponsel ke lebar',
-      (tester) async {
+  testWidgets('Data tetap tampil saat layar berganti dari ponsel ke lebar', (
+    tester,
+  ) async {
     final repo = RepositoriMemori();
     Repositori.instance = repo;
     await repo.tambahPesanan(pesananUji(nama: 'Pelanggan A'));
@@ -33,8 +34,9 @@ void main() {
     expect(find.text('Pelanggan A'), findsWidgets);
   });
 
-  testWidgets('Nominal jutaan pada nota tidak terpotong di layar 375 px',
-      (tester) async {
+  testWidgets('Nominal jutaan pada nota tidak terpotong di layar 375 px', (
+    tester,
+  ) async {
     final p = pesananUji().copyWith(
       rincian: [
         RincianMenu(
@@ -49,14 +51,19 @@ void main() {
     tester.view.physicalSize = const Size(375, 812);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.light,
-      home: NotaScreen(pesanan: p),
-    ));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: NotaScreen(pesanan: p),
+      ),
+    );
 
     for (final teks in ['1.500.000', '50 pcs', 'Kirim 05/11/2026']) {
-      expect(tester.getSize(find.text(teks)).height, lessThan(20),
-          reason: teks);
+      expect(
+        tester.getSize(find.text(teks)).height,
+        lessThan(20),
+        reason: teks,
+      );
     }
   });
 }

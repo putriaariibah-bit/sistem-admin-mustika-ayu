@@ -169,13 +169,15 @@ void main() {
   });
 
   testWidgets('Nota lunas menulis sisa 0 dengan warna hijau', (tester) async {
-    final lunas = _pesananBB12.copyWith(pembayaran: [
-      Pembayaran(
-        noUrut: 1,
-        tanggalBayar: DateTime(2026, 11, 3),
-        nominal: 141000,
-      ),
-    ]);
+    final lunas = _pesananBB12.copyWith(
+      pembayaran: [
+        Pembayaran(
+          noUrut: 1,
+          tanggalBayar: DateTime(2026, 11, 3),
+          nominal: 141000,
+        ),
+      ],
+    );
     await tester.pumpWidget(MaterialApp(home: NotaScreen(pesanan: lunas)));
 
     final sisa = tester.widget<Text>(find.byKey(const Key('nota-sisa')));
@@ -183,8 +185,9 @@ void main() {
     expect(sisa.style?.color, AppTheme.bayarLunas);
   });
 
-  testWidgets('BB-20: Simpan lalu Bagikan memakai berkas gambar nota',
-      (tester) async {
+  testWidgets('BB-20: Simpan lalu Bagikan memakai berkas gambar nota', (
+    tester,
+  ) async {
     final tiruan = _BerkasTiruan();
     BerkasNota.instance = tiruan;
     addTearDown(() => BerkasNota.instance = BerkasNotaPerangkat());

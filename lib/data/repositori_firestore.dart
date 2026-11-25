@@ -38,15 +38,15 @@ class RepositoriFirestore implements Repositori {
 
   @override
   Stream<ProfilUsaha?> pantauProfil() => _usaha.snapshots().map((d) {
-        final data = d.data();
-        return data == null ? null : ProfilUsaha.fromMap(data);
-      });
+    final data = d.data();
+    return data == null ? null : ProfilUsaha.fromMap(data);
+  });
 
   @override
-  Future<void> simpanProfil(ProfilUsaha profil) => _usaha.set(
-        {...profil.toMap(), 'diperbarui': FieldValue.serverTimestamp()},
-        SetOptions(merge: true),
-      );
+  Future<void> simpanProfil(ProfilUsaha profil) => _usaha.set({
+    ...profil.toMap(),
+    'diperbarui': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
 
   // ── Pelanggan ────────────────────────────────────────────────
 
@@ -103,16 +103,18 @@ class RepositoriFirestore implements Repositori {
       .collection('riwayat')
       .orderBy('waktu', descending: true)
       .snapshots()
-      .map((s) => [
-            for (final d in s.docs) RiwayatPerubahan.fromMap(d.id, d.data()),
-          ]);
+      .map(
+        (s) => [
+          for (final d in s.docs) RiwayatPerubahan.fromMap(d.id, d.data()),
+        ],
+      );
 
   @override
   Future<String> tambahPesanan(Pesanan pesanan) async {
     final sekarang = DateTime.now();
-    final ref = await _pesanan.add(_keDokumen(
-      pesanan.copyWith(dibuatPada: sekarang, diubahPada: sekarang),
-    ));
+    final ref = await _pesanan.add(
+      _keDokumen(pesanan.copyWith(dibuatPada: sekarang, diubahPada: sekarang)),
+    );
     return ref.id;
   }
 

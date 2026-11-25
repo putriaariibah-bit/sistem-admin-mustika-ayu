@@ -21,13 +21,13 @@ class KotakIkon extends StatelessWidget {
 
   /// Kotak ikon dengan warna status pembayaran (Belum bayar, DP, Lunas).
   KotakIkon.status(StatusPembayaran status, {Key? key, double ukuran = 36})
-      : this(
-          key: key,
-          ikon: WarnaStatus.ikon(status),
-          warna: WarnaStatus.utama(status),
-          latar: WarnaStatus.latar(status),
-          ukuran: ukuran,
-        );
+    : this(
+        key: key,
+        ikon: WarnaStatus.ikon(status),
+        warna: WarnaStatus.utama(status),
+        latar: WarnaStatus.latar(status),
+        ukuran: ukuran,
+      );
 
   @override
   Widget build(BuildContext context) {

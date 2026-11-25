@@ -38,8 +38,11 @@ class RepositoriMemori implements Repositori {
   }
 
   @override
-  Stream<List<Pelanggan>> pantauPelanggan() => _pantau(() =>
-      List<Pelanggan>.of(_pelanggan)..sort((a, b) => a.nama.compareTo(b.nama)));
+  Stream<List<Pelanggan>> pantauPelanggan() => _pantau(
+    () =>
+        List<Pelanggan>.of(_pelanggan)
+          ..sort((a, b) => a.nama.compareTo(b.nama)),
+  );
 
   @override
   Future<Pelanggan> simpanPelanggan(Pelanggan pelanggan) async {
@@ -56,23 +59,26 @@ class RepositoriMemori implements Repositori {
   }
 
   @override
-  Stream<List<Pesanan>> pantauPesanan() => _pantau(() =>
-      List<Pesanan>.of(_pesanan)
-        ..sort((a, b) => b.tanggalNota.compareTo(a.tanggalNota)));
+  Stream<List<Pesanan>> pantauPesanan() => _pantau(
+    () =>
+        List<Pesanan>.of(_pesanan)
+          ..sort((a, b) => b.tanggalNota.compareTo(a.tanggalNota)),
+  );
 
   @override
   Stream<Pesanan?> pantauSatuPesanan(String id) => _pantau(() {
-        for (final p in _pesanan) {
-          if (p.id == id) return p;
-        }
-        return null;
-      });
+    for (final p in _pesanan) {
+      if (p.id == id) return p;
+    }
+    return null;
+  });
 
   @override
-  Stream<List<RiwayatPerubahan>> pantauRiwayat(String pesananId) =>
-      _pantau(() => List<RiwayatPerubahan>.of(_riwayat[pesananId] ?? const [])
-          .reversed
-          .toList());
+  Stream<List<RiwayatPerubahan>> pantauRiwayat(String pesananId) => _pantau(
+    () =>
+        List<RiwayatPerubahan>.of(_riwayat[pesananId] ?? const []).reversed
+            .toList(),
+  );
 
   @override
   Future<String> tambahPesanan(Pesanan pesanan) async {

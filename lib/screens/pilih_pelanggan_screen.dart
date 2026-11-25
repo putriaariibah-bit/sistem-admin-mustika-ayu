@@ -19,8 +19,8 @@ class PilihPelangganScreen extends StatefulWidget {
 
 class _PilihPelangganScreenState extends State<PilihPelangganScreen> {
   final _cariController = TextEditingController();
-  late final Stream<List<Pelanggan>> _stream =
-      Repositori.instance.pantauPelanggan();
+  late final Stream<List<Pelanggan>> _stream = Repositori.instance
+      .pantauPelanggan();
 
   @override
   void dispose() {
@@ -37,16 +37,22 @@ class _PilihPelangganScreenState extends State<PilihPelangganScreen> {
     if (nama == null || !mounted) return;
 
     final disimpan = await Repositori.instance.simpanPelanggan(
-      pelanggan == null ? Pelanggan(nama: nama) : pelanggan.copyWith(nama: nama),
+      pelanggan == null
+          ? Pelanggan(nama: nama)
+          : pelanggan.copyWith(nama: nama),
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(pelanggan == null
-            ? 'Pelanggan ${disimpan.nama} ditambahkan.'
-            : 'Nama pelanggan diubah.'),
-      ));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            pelanggan == null
+                ? 'Pelanggan ${disimpan.nama} ditambahkan.'
+                : 'Nama pelanggan diubah.',
+          ),
+        ),
+      );
   }
 
   @override
@@ -56,7 +62,9 @@ class _PilihPelangganScreenState extends State<PilihPelangganScreen> {
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
+            constraints: const BoxConstraints(
+              maxWidth: AppTheme.lebarKontenMaks,
+            ),
             child: StreamBuilder<List<Pelanggan>>(
               stream: _stream,
               builder: (context, snapshot) {
@@ -86,7 +94,8 @@ class _PilihPelangganScreenState extends State<PilihPelangganScreen> {
                       const EmptyState(
                         icon: Icons.person_search_outlined,
                         title: 'Pelanggan tidak ditemukan',
-                        subtitle: 'Tambahkan pelanggan baru dengan tombol '
+                        subtitle:
+                            'Tambahkan pelanggan baru dengan tombol '
                             'di bawah.',
                       )
                     else

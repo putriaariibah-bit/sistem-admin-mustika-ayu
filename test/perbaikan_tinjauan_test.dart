@@ -19,22 +19,27 @@ double _kontras(Color a, Color b) {
 
 void main() {
   test('Teks tersier cukup kontras di atas putih (WCAG AA 4,5:1)', () {
-    expect(_kontras(AppTheme.textTersier, Colors.white),
-        greaterThanOrEqualTo(4.5));
+    expect(
+      _kontras(AppTheme.textTersier, Colors.white),
+      greaterThanOrEqualTo(4.5),
+    );
   });
 
-  testWidgets('Baris kiriman di Dashboard punya Material untuk efek ketuk',
-      (tester) async {
+  testWidgets('Baris kiriman di Dashboard punya Material untuk efek ketuk', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(375, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.light,
-      home: DashboardScreen(
-        semua: [pesananUji(tanggal: DateTime.now())],
-        onPesananTap: (_) {},
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: DashboardScreen(
+          semua: [pesananUji(tanggal: DateTime.now())],
+          onPesananTap: (_) {},
+        ),
       ),
-    ));
+    );
 
     final kartu = find.byKey(const Key('kartu-kiriman-hari-ini'));
     final ink = find.descendant(of: kartu, matching: find.byType(InkWell));
@@ -45,8 +50,9 @@ void main() {
     );
   });
 
-  testWidgets('Tombol bawah Detail selebar konten pada layar lebar',
-      (tester) async {
+  testWidgets('Tombol bawah Detail selebar konten pada layar lebar', (
+    tester,
+  ) async {
     final repo = RepositoriMemori();
     Repositori.instance = repo;
     final p = pesananUji();
@@ -54,10 +60,12 @@ void main() {
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.light,
-      home: DetailPesananScreen(pesanan: p.copyWith(id: id)),
-    ));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: DetailPesananScreen(pesanan: p.copyWith(id: id)),
+      ),
+    );
     await tester.pump();
 
     final kiri = tester.getRect(find.byKey(const Key('ubah-pesanan'))).left;

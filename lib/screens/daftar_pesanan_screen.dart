@@ -21,13 +21,12 @@ enum Saringan {
   final String label;
 
   bool cocok(Pesanan p, DateTime hariIni) => switch (this) {
-        Saringan.semua => true,
-        Saringan.dikirimHariIni => p.dikirimPada(hariIni),
-        Saringan.belumBayar =>
-          p.statusPembayaran == StatusPembayaran.belumBayar,
-        Saringan.dp => p.statusPembayaran == StatusPembayaran.dp,
-        Saringan.lunas => p.statusPembayaran == StatusPembayaran.lunas,
-      };
+    Saringan.semua => true,
+    Saringan.dikirimHariIni => p.dikirimPada(hariIni),
+    Saringan.belumBayar => p.statusPembayaran == StatusPembayaran.belumBayar,
+    Saringan.dp => p.statusPembayaran == StatusPembayaran.dp,
+    Saringan.lunas => p.statusPembayaran == StatusPembayaran.lunas,
+  };
 }
 
 /// Halaman Daftar Pesanan (Gambar 3.6(c)).
@@ -70,9 +69,9 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
   }
 
   void _bukaNota(Pesanan p) => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => NotaScreen(pesanan: p)),
-      );
+    context,
+    MaterialPageRoute(builder: (context) => NotaScreen(pesanan: p)),
+  );
 
   @override
   Widget build(BuildContext context) {

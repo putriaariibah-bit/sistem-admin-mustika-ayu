@@ -17,11 +17,7 @@ class SummaryCard extends StatelessWidget {
   /// Nilai angka yang ditampilkan.
   final int value;
 
-  const SummaryCard({
-    super.key,
-    required this.title,
-    required this.value,
-  });
+  const SummaryCard({super.key, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {

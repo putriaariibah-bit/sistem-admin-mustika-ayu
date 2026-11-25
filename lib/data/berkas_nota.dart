@@ -55,8 +55,11 @@ class BerkasNotaPerangkat implements BerkasNota {
   @override
   Future<void> simpan(Uint8List png, String namaBerkas) async {
     if (kIsWeb) {
-      await XFile.fromData(png, mimeType: 'image/png', name: namaBerkas)
-          .saveTo(namaBerkas);
+      await XFile.fromData(
+        png,
+        mimeType: 'image/png',
+        name: namaBerkas,
+      ).saveTo(namaBerkas);
       return;
     }
     if (!await Gal.hasPermission(toAlbum: true)) {

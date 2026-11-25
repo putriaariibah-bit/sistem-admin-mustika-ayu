@@ -76,8 +76,9 @@ void main() {
     });
   });
 
-  testWidgets('Profil kosong tidak bisa disimpan tanpa nama usaha',
-      (tester) async {
+  testWidgets('Profil kosong tidak bisa disimpan tanpa nama usaha', (
+    tester,
+  ) async {
     await tester.pumpWidget(_bungkus(const ProfilUsahaScreen(wajib: true)));
 
     await tester.tap(find.byKey(const Key('simpan-profil')));
@@ -88,17 +89,24 @@ void main() {
   });
 
   testWidgets('Profil dan logo yang dipilih tersimpan', (tester) async {
-    await tester.pumpWidget(_bungkus(ProfilUsahaScreen(
-      wajib: true,
-      pilihGambar: () async => _pngKecil,
-    )));
+    await tester.pumpWidget(
+      _bungkus(
+        ProfilUsahaScreen(wajib: true, pilihGambar: () async => _pngKecil),
+      ),
+    );
 
     await tester.enterText(
-        find.byKey(const Key('profil-nama')), '  Dapur Bu Sari ');
+      find.byKey(const Key('profil-nama')),
+      '  Dapur Bu Sari ',
+    );
     await tester.enterText(
-        find.byKey(const Key('profil-alamat')), 'Jl. Melati 5');
+      find.byKey(const Key('profil-alamat')),
+      'Jl. Melati 5',
+    );
     await tester.enterText(
-        find.byKey(const Key('profil-whatsapp')), '081234567890');
+      find.byKey(const Key('profil-whatsapp')),
+      '081234567890',
+    );
     await tester.tap(find.byKey(const Key('pilih-logo')));
     await tester.pump();
     expect(find.byKey(const Key('hapus-logo')), findsOneWidget);
@@ -114,10 +122,13 @@ void main() {
   });
 
   testWidgets('Logo yang terlalu besar ditolak', (tester) async {
-    await tester.pumpWidget(_bungkus(ProfilUsahaScreen(
-      pilihGambar: () async =>
-          Uint8List(ProfilUsahaScreen.batasLogo + 1),
-    )));
+    await tester.pumpWidget(
+      _bungkus(
+        ProfilUsahaScreen(
+          pilihGambar: () async => Uint8List(ProfilUsahaScreen.batasLogo + 1),
+        ),
+      ),
+    );
 
     await tester.tap(find.byKey(const Key('pilih-logo')));
     await tester.pump();
@@ -126,16 +137,16 @@ void main() {
     expect(find.byKey(const Key('hapus-logo')), findsNothing);
   });
 
-  testWidgets('Akun baru tanpa profil diarahkan ke Profil Usaha',
-      (tester) async {
+  testWidgets('Akun baru tanpa profil diarahkan ke Profil Usaha', (
+    tester,
+  ) async {
     await tester.pumpWidget(_bungkus(const GerbangProfil()));
     await tester.pump();
 
     expect(find.byType(ProfilUsahaScreen), findsOneWidget);
   });
 
-  testWidgets('Akun dengan profil langsung masuk ke Dashboard',
-      (tester) async {
+  testWidgets('Akun dengan profil langsung masuk ke Dashboard', (tester) async {
     await repo.simpanProfil(const ProfilUsaha(nama: 'Dapur Bu Sari'));
     await tester.pumpWidget(_bungkus(const GerbangProfil()));
     await tester.pump();
@@ -146,34 +157,75 @@ void main() {
     expect(ProfilUsaha.aktif.value.nama, 'Dapur Bu Sari');
   });
 
-  testWidgets('Kepala nota memakai profil usaha dan huruf depan bila tanpa logo',
-      (tester) async {
-    await tester.pumpWidget(_bungkus(Scaffold(
-      body: SingleChildScrollView(
-        child: NotaKertas(
-          nota: Nota.dariPesanan(pesananUji()),
-          profil: const ProfilUsaha(nama: 'Dapur Bu Sari'),
+  testWidgets(
+    'Kepala nota memakai profil usaha dan huruf depan bila tanpa logo',
+    (tester) async {
+      await tester.pumpWidget(
+        _bungkus(
+          Scaffold(
+            body: SingleChildScrollView(
+              child: NotaKertas(
+                nota: Nota.dariPesanan(pesananUji()),
+                profil: const ProfilUsaha(nama: 'Dapur Bu Sari'),
+              ),
+            ),
+          ),
         ),
-      ),
-    )));
+      );
 
-    expect(find.text('Dapur Bu Sari'), findsOneWidget);
-    expect(find.text('DB'), findsOneWidget);
-    expect(find.textContaining('WA:'), findsNothing);
-    expect(
-      find.text('Terima kasih atas pesanan Anda di Dapur Bu Sari.'),
-      findsOneWidget,
-    );
-  });
+      expect(find.text('Dapur Bu Sari'), findsOneWidget);
+      expect(find.text('DB'), findsOneWidget);
+      expect(find.textContaining('WA:'), findsNothing);
+      expect(
+        find.text('Terima kasih atas pesanan Anda di Dapur Bu Sari.'),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('LogoUsaha memakai logo unggahan dari profil', (tester) async {
-    await tester.pumpWidget(_bungkus(Scaffold(
-      body: LogoUsaha(
-        profil: ProfilUsaha(nama: 'Dapur', logo: base64Encode(_pngKecil)),
+    await tester.pumpWidget(
+      _bungkus(
+        Scaffold(
+          body: LogoUsaha(
+            profil: ProfilUsaha(nama: 'Dapur', logo: base64Encode(_pngKecil)),
+          ),
+        ),
       ),
-    )));
+    );
 
     final gambar = tester.widget<Image>(find.byType(Image));
     expect(gambar.image, isA<MemoryImage>());
+  });
+
+  testWidgets('Akun Google tanpa kata sandi dapat mengatur kata sandi',
+      (tester) async {
+    String? sandiBaru;
+    await tester.pumpWidget(_bungkus(ProfilUsahaScreen(
+      awal: const ProfilUsaha(nama: 'Dapur Bu Sari'),
+      punyaKataSandi: false,
+      fungsiAturSandi: (sandi) async => sandiBaru = sandi,
+    )));
+
+    await tester.ensureVisible(find.byKey(const Key('atur-kata-sandi')));
+    await tester.tap(find.byKey(const Key('atur-kata-sandi')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('sandi-baru')), 'rahasia1');
+    await tester.enterText(find.byKey(const Key('ulangi-sandi-baru')), 'rahasia1');
+    await tester.tap(find.byKey(const Key('simpan-sandi-baru')));
+    await tester.pumpAndSettle();
+
+    expect(sandiBaru, 'rahasia1');
+    expect(find.byKey(const Key('atur-kata-sandi')), findsNothing);
+  });
+
+  testWidgets('Akun yang sudah punya kata sandi tidak menampilkan Atur kata sandi',
+      (tester) async {
+    await tester.pumpWidget(_bungkus(const ProfilUsahaScreen(
+      awal: ProfilUsaha(nama: 'Dapur Bu Sari'),
+      punyaKataSandi: true,
+    )));
+
+    expect(find.byKey(const Key('atur-kata-sandi')), findsNothing);
   });
 }

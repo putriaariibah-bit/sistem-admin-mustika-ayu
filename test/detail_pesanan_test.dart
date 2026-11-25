@@ -16,16 +16,19 @@ Future<void> _buka(WidgetTester tester, Pesanan p) async {
   tester.view.physicalSize = const Size(375, 812);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(MaterialApp(
-    theme: AppTheme.light,
-    home: DetailPesananScreen(pesanan: p.copyWith(id: id)),
-  ));
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: AppTheme.light,
+      home: DetailPesananScreen(pesanan: p.copyWith(id: id)),
+    ),
+  );
   await tester.pump();
 }
 
 void main() {
-  testWidgets('Tombol Lihat Nota dan Ubah terlihat tanpa menggulir',
-      (tester) async {
+  testWidgets('Tombol Lihat Nota dan Ubah terlihat tanpa menggulir', (
+    tester,
+  ) async {
     await _buka(tester, pesananUji(dibayar: 141000));
 
     for (final kunci in ['lihat-nota', 'ubah-pesanan']) {

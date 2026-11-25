@@ -16,20 +16,21 @@ Future<void> _pasang(
   tester.view.physicalSize = const Size(360, 740);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(MaterialApp(
-    theme: AppTheme.light,
-    builder: (context, anak) => MediaQuery(
-      data: MediaQuery.of(context)
-          .copyWith(textScaler: TextScaler.linear(skalaHuruf)),
-      child: anak!,
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: AppTheme.light,
+      builder: (context, anak) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(skalaHuruf)),
+        child: anak!,
+      ),
+      home: DashboardScreen(semua: semua, onKeluar: () {}),
     ),
-    home: DashboardScreen(semua: semua, onKeluar: () {}),
-  ));
+  );
 }
 
 void main() {
-  testWidgets('Dashboard memakai logo dan kartu kiriman putih',
-      (tester) async {
+  testWidgets('Dashboard memakai logo dan kartu kiriman putih', (tester) async {
     await _pasang(tester, const []);
 
     expect(find.byType(LogoUsaha), findsOneWidget);
@@ -40,8 +41,9 @@ void main() {
     expect(find.text('Tidak ada kiriman hari ini'), findsOneWidget);
   });
 
-  testWidgets('Tujuh kiriman hari ini: lima baris dan sisa dua',
-      (tester) async {
+  testWidgets('Tujuh kiriman hari ini: lima baris dan sisa dua', (
+    tester,
+  ) async {
     final hariIni = DateTime.now();
     await _pasang(tester, [
       for (var i = 0; i < 7; i++)
@@ -52,8 +54,7 @@ void main() {
     expect(find.text('Pelanggan 5'), findsNothing);
   });
 
-  testWidgets('Layar 360 px dengan huruf 1,3x tidak meluber',
-      (tester) async {
+  testWidgets('Layar 360 px dengan huruf 1,3x tidak meluber', (tester) async {
     await _pasang(tester, [pesananUji()], skalaHuruf: 1.3);
     expect(tester.takeException(), isNull);
   });

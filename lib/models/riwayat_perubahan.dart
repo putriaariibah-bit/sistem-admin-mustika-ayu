@@ -20,11 +20,11 @@ class RiwayatPerubahan {
   });
 
   Map<String, Object?> toMap() => {
-        'waktu': waktu,
-        'bagian': bagian,
-        'nilaiLama': nilaiLama,
-        'nilaiBaru': nilaiBaru,
-      };
+    'waktu': waktu,
+    'bagian': bagian,
+    'nilaiLama': nilaiLama,
+    'nilaiBaru': nilaiBaru,
+  };
 
   factory RiwayatPerubahan.fromMap(String id, Map<String, Object?> data) =>
       RiwayatPerubahan(

@@ -308,10 +308,7 @@ class _AngkaStatus extends StatelessWidget {
             child: Text(
               status.label,
               maxLines: 1,
-              style: const TextStyle(
-                fontSize: 11,
-                color: KepalaBiru.teksRedup,
-              ),
+              style: const TextStyle(fontSize: 11, color: KepalaBiru.teksRedup),
             ),
           ),
         ],
@@ -343,7 +340,9 @@ class _KartuKiriman extends StatelessWidget {
     final porsiHariIni = pesanan.fold<int>(0, (jumlah, p) {
       return jumlah +
           p.rincian
-              .where((r) => Konversi.kunciTanggal(r.tanggalKirim) == kunciHariIni)
+              .where(
+                (r) => Konversi.kunciTanggal(r.tanggalKirim) == kunciHariIni,
+              )
               .fold<int>(0, (j, r) => j + r.jumlahPorsi);
     });
 

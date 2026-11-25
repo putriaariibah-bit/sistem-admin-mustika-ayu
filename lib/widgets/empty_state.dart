@@ -37,11 +37,7 @@ class EmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // ── Ikon ──────────────────────────────────────────────
-            Icon(
-              icon,
-              size: 64,
-              color: AppTheme.textSecondary,
-            ),
+            Icon(icon, size: 64, color: AppTheme.textSecondary),
             const SizedBox(height: AppTheme.spacing16),
             // ── Judul ─────────────────────────────────────────────
             Text(

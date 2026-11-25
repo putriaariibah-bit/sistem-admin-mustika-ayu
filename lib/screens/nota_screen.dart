@@ -36,8 +36,9 @@ class _NotaScreenState extends State<NotaScreen> {
     setState(() => _sibuk = true);
     String? pesan;
     try {
-      final batas = _kunciNota.currentContext!.findRenderObject()!
-          as RenderRepaintBoundary;
+      final batas =
+          _kunciNota.currentContext!.findRenderObject()!
+              as RenderRepaintBoundary;
       final png = await gambarNota(batas);
       await aksi(png, _nota.namaBerkas);
       pesan = pesanBerhasil;
@@ -54,16 +55,17 @@ class _NotaScreenState extends State<NotaScreen> {
   }
 
   void _simpan() => _jalankan(
-        BerkasNota.instance.simpan,
-        pesanBerhasil: 'Nota tersimpan di Galeri, album '
-            '${BerkasNotaPerangkat.album}.',
-        pesanGagal: 'Nota gagal disimpan.',
-      );
+    BerkasNota.instance.simpan,
+    pesanBerhasil:
+        'Nota tersimpan di Galeri, album '
+        '${BerkasNotaPerangkat.album}.',
+    pesanGagal: 'Nota gagal disimpan.',
+  );
 
   void _bagikan() => _jalankan(
-        BerkasNota.instance.bagikan,
-        pesanGagal: 'Menu berbagi gagal dibuka.',
-      );
+    BerkasNota.instance.bagikan,
+    pesanGagal: 'Menu berbagi gagal dibuka.',
+  );
 
   @override
   Widget build(BuildContext context) {

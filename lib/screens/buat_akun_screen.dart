@@ -38,11 +38,21 @@ class _BuatAkunScreenState extends State<BuatAkunScreen> {
     super.dispose();
   }
 
-  Future<void> _buatFirebase(String email, String kataSandi) =>
-      FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: kataSandi,
-      );
+  /// Membuat akun, lalu mengirim email verifikasi. Email yang sudah
+  /// diverifikasi membuat Firebase menggabungkan cara masuk Google dengan
+  /// kata sandi (bukan menghapus kata sandinya) bila pemilik nanti masuk
+  /// dengan Google memakai email yang sama.
+  Future<void> _buatFirebase(String email, String kataSandi) async {
+    final hasil = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: kataSandi,
+    );
+    try {
+      await hasil.user?.sendEmailVerification();
+    } catch (_) {
+      // Gagal mengirim email verifikasi tidak menghalangi akun dipakai.
+    }
+  }
 
   Future<void> _kirim() async {
     setState(() => _pesanGagal = null);
@@ -71,20 +81,19 @@ class _BuatAkunScreenState extends State<BuatAkunScreen> {
   }
 
   InputDecoration _dekorasiSandi(String label) => InputDecoration(
-        labelText: label,
-        suffixIcon: IconButton(
-          tooltip: _sandiTersembunyi
-              ? 'Tampilkan kata sandi'
-              : 'Sembunyikan kata sandi',
-          icon: Icon(
-            _sandiTersembunyi
-                ? Icons.visibility_outlined
-                : Icons.visibility_off_outlined,
-          ),
-          onPressed: () =>
-              setState(() => _sandiTersembunyi = !_sandiTersembunyi),
-        ),
-      );
+    labelText: label,
+    suffixIcon: IconButton(
+      tooltip: _sandiTersembunyi
+          ? 'Tampilkan kata sandi'
+          : 'Sembunyikan kata sandi',
+      icon: Icon(
+        _sandiTersembunyi
+            ? Icons.visibility_outlined
+            : Icons.visibility_off_outlined,
+      ),
+      onPressed: () => setState(() => _sandiTersembunyi = !_sandiTersembunyi),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +112,9 @@ class _BuatAkunScreenState extends State<BuatAkunScreen> {
                   children: [
                     const Text(
                       'Buat akun untuk mencatat pesanan usaha katering milikmu. '
-                      'Setelah itu kamu akan diminta mengisi profil usaha.',
+                      'Setelah itu kamu akan diminta mengisi profil usaha, '
+                      'dan kami mengirim email untuk memverifikasi alamat '
+                      'emailmu.',
                       style: TextStyle(
                         fontSize: AppTheme.isi,
                         color: AppTheme.textSecondary,
@@ -128,7 +139,9 @@ class _BuatAkunScreenState extends State<BuatAkunScreen> {
                       obscureText: _sandiTersembunyi,
                       textInputAction: TextInputAction.next,
                       autofillHints: const [AutofillHints.newPassword],
-                      decoration: _dekorasiSandi('Kata sandi (minimal 6 karakter)'),
+                      decoration: _dekorasiSandi(
+                        'Kata sandi (minimal 6 karakter)',
+                      ),
                       validator: ValidasiMasuk.kataSandiBaru,
                     ),
                     const SizedBox(height: AppTheme.spacing16),

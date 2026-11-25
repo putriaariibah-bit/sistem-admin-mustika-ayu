@@ -84,52 +84,49 @@ class _RekapScreenState extends State<RekapScreen> {
     required Color latar,
     required Color garis,
     Key? kunci,
-  }) =>
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: latar,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: garis),
+  }) => Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: latar,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: garis),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ikon,
+        const SizedBox(height: 10),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: warna,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ikon,
-            const SizedBox(height: 10),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: warna,
-              ),
+        const SizedBox(height: 2),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            nilai,
+            key: kunci,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: warna,
+              fontFeatures: AppTheme.angkaRata,
             ),
-            const SizedBox(height: 2),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                nilai,
-                key: kunci,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: warna,
-                  fontFeatures: AppTheme.angkaRata,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
-  static Color _lembut(Color warna) => Color.alphaBlend(
-        warna.withValues(alpha: 0.05),
-        Colors.white,
-      );
+  static Color _lembut(Color warna) =>
+      Color.alphaBlend(warna.withValues(alpha: 0.05), Colors.white);
 
   @override
   Widget build(BuildContext context) {
@@ -267,8 +264,9 @@ class _RekapScreenState extends State<RekapScreen> {
                         ),
                       ),
                       const Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: AppTheme.spacing12),
+                        padding: EdgeInsets.symmetric(
+                          vertical: AppTheme.spacing12,
+                        ),
                         child: Divider(color: AppTheme.garisKartu),
                       ),
                       Row(

@@ -42,9 +42,9 @@ class _BarisMenu {
     String nama = '',
     String porsi = '',
     String harga = '',
-  })  : nama = TextEditingController(text: nama),
-        porsi = TextEditingController(text: porsi),
-        harga = TextEditingController(text: harga);
+  }) : nama = TextEditingController(text: nama),
+       porsi = TextEditingController(text: porsi),
+       harga = TextEditingController(text: harga);
 
   int get subtotal =>
       (int.tryParse(porsi.text.trim()) ?? 0) *
@@ -63,9 +63,9 @@ class _BarisOngkir {
   final TextEditingController tarif;
 
   _BarisOngkir({String keterangan = '', String jumlah = '', String tarif = ''})
-      : keterangan = TextEditingController(text: keterangan),
-        jumlah = TextEditingController(text: jumlah),
-        tarif = TextEditingController(text: tarif);
+    : keterangan = TextEditingController(text: keterangan),
+      jumlah = TextEditingController(text: jumlah),
+      tarif = TextEditingController(text: tarif);
 
   int get subtotal =>
       (int.tryParse(jumlah.text.trim()) ?? 0) *
@@ -88,8 +88,8 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
   final List<_BarisMenu> _menu = [];
   final List<_BarisOngkir> _ongkir = [];
 
-  late final Stream<List<Pelanggan>> _streamPelanggan =
-      Repositori.instance.pantauPelanggan();
+  late final Stream<List<Pelanggan>> _streamPelanggan = Repositori.instance
+      .pantauPelanggan();
   TextEditingController? _pelangganController;
   String? _pesanRincian;
   bool _menyimpan = false;
@@ -111,19 +111,23 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
     _tanggalNota = awal.tanggalNota;
     _jenis = awal.jenisPesanan;
     for (final r in awal.rincian) {
-      _menu.add(_BarisMenu(
-        tanggalKirim: r.tanggalKirim,
-        nama: r.namaMenu,
-        porsi: '${r.jumlahPorsi}',
-        harga: Format.ribuan(r.hargaPerPorsi),
-      ));
+      _menu.add(
+        _BarisMenu(
+          tanggalKirim: r.tanggalKirim,
+          nama: r.namaMenu,
+          porsi: '${r.jumlahPorsi}',
+          harga: Format.ribuan(r.hargaPerPorsi),
+        ),
+      );
     }
     for (final o in awal.ongkosKirim) {
-      _ongkir.add(_BarisOngkir(
-        keterangan: o.keterangan,
-        jumlah: '${o.jumlahKirim}',
-        tarif: Format.ribuan(o.tarif),
-      ));
+      _ongkir.add(
+        _BarisOngkir(
+          keterangan: o.keterangan,
+          jumlah: '${o.jumlahKirim}',
+          tarif: Format.ribuan(o.tarif),
+        ),
+      );
     }
   }
 
@@ -166,8 +170,9 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
       _pakaiPelanggan(ada);
       return;
     }
-    final baru = await Repositori.instance
-        .simpanPelanggan(Pelanggan(nama: opsi.namaBaru));
+    final baru = await Repositori.instance.simpanPelanggan(
+      Pelanggan(nama: opsi.namaBaru),
+    );
     if (!mounted) return;
     _pakaiPelanggan(baru);
     ScaffoldMessenger.of(context)
@@ -178,14 +183,14 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
   }
 
   Future<DateTime?> _pilihTanggal(DateTime awal) => showDatePicker(
-        context: context,
-        initialDate: awal,
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2100),
-        helpText: 'Pilih tanggal',
-        cancelText: 'Batal',
-        confirmText: 'Pilih',
-      );
+    context: context,
+    initialDate: awal,
+    firstDate: DateTime(2020),
+    lastDate: DateTime(2100),
+    helpText: 'Pilih tanggal',
+    cancelText: 'Batal',
+    confirmText: 'Pilih',
+  );
 
   void _tambahMenu() {
     final tanggal = _menu.isEmpty ? _tanggalNota : _menu.last.tanggalKirim;
@@ -250,10 +255,14 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
     final pesanan = _susunPesanan();
     final awal = widget.pesananAwal;
     if (awal != null && pesanan.totalTagihan < awal.totalDibayar) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Total tagihan tidak boleh kurang dari jumlah yang '
-            'sudah dibayar.'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Total tagihan tidak boleh kurang dari jumlah yang '
+            'sudah dibayar.',
+          ),
+        ),
+      );
       return;
     }
 
@@ -268,9 +277,8 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _menyimpan = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pesanan gagal disimpan: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Pesanan gagal disimpan: $e')));
     }
   }
 
@@ -281,16 +289,15 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
     required String label,
     required DateTime tanggal,
     required ValueChanged<DateTime> onDipilih,
-  }) =>
-      OutlinedButton.icon(
-        key: key,
-        onPressed: () async {
-          final hasil = await _pilihTanggal(tanggal);
-          if (hasil != null && mounted) setState(() => onDipilih(hasil));
-        },
-        icon: const Icon(Icons.calendar_today_outlined, size: 18),
-        label: Text('$label: ${Format.tanggal(tanggal)}'),
-      );
+  }) => OutlinedButton.icon(
+    key: key,
+    onPressed: () async {
+      final hasil = await _pilihTanggal(tanggal);
+      if (hasil != null && mounted) setState(() => onDipilih(hasil));
+    },
+    icon: const Icon(Icons.calendar_today_outlined, size: 18),
+    label: Text('$label: ${Format.tanggal(tanggal)}'),
+  );
 
   Widget _kartuMenu(int i) {
     final b = _menu[i];
@@ -430,7 +437,9 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
                     key: Key('jumlah-kirim-$i'),
                     controller: b.jumlah,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Jumlah kirim'),
+                    decoration: const InputDecoration(
+                      labelText: 'Jumlah kirim',
+                    ),
                     validator: AturanPesanan.validasiJumlahKirim,
                     onChanged: (_) => setState(() {}),
                   ),
@@ -514,25 +523,32 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
               elevation: 4,
               borderRadius: BorderRadius.circular(AppTheme.sudutKartu),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 240, maxWidth: 480),
+                constraints: const BoxConstraints(
+                  maxHeight: 240,
+                  maxWidth: 480,
+                ),
                 child: ListView(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
                   children: [
                     for (final o in opsi)
                       ListTile(
-                        key: Key(o.pelanggan == null
-                            ? 'saran-pelanggan-baru'
-                            : 'saran-${o.pelanggan!.id}'),
+                        key: Key(
+                          o.pelanggan == null
+                              ? 'saran-pelanggan-baru'
+                              : 'saran-${o.pelanggan!.id}',
+                        ),
                         leading: Icon(
                           o.pelanggan == null
                               ? Icons.person_add_alt_1_outlined
                               : Icons.person_outline,
                           color: AppTheme.primary,
                         ),
-                        title: Text(o.pelanggan == null
-                            ? 'Tambah pelanggan baru: ${o.nama}'
-                            : o.nama),
+                        title: Text(
+                          o.pelanggan == null
+                              ? 'Tambah pelanggan baru: ${o.nama}'
+                              : o.nama,
+                        ),
                         onTap: () => onSelected(o),
                       ),
                   ],
@@ -586,8 +602,9 @@ class _FormPesananScreenState extends State<FormPesananScreen> {
             padding: const EdgeInsets.all(AppTheme.marginTepi),
             child: Center(
               child: ConstrainedBox(
-                constraints:
-                    const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
+                constraints: const BoxConstraints(
+                  maxWidth: AppTheme.lebarKontenMaks,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

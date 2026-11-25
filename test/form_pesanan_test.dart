@@ -11,10 +11,9 @@ Future<void> _bukaForm(WidgetTester tester) async {
   tester.view.physicalSize = const Size(800, 2400);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(MaterialApp(
-    theme: AppTheme.light,
-    home: const FormPesananScreen(),
-  ));
+  await tester.pumpWidget(
+    MaterialApp(theme: AppTheme.light, home: const FormPesananScreen()),
+  );
 }
 
 void main() {

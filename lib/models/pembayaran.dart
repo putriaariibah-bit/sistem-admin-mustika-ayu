@@ -17,16 +17,16 @@ class Pembayaran {
   });
 
   Map<String, Object?> toMap() => {
-        'noUrut': noUrut,
-        'tanggalBayar': tanggalBayar,
-        'nominal': nominal,
-        'keterangan': keterangan.trim(),
-      };
+    'noUrut': noUrut,
+    'tanggalBayar': tanggalBayar,
+    'nominal': nominal,
+    'keterangan': keterangan.trim(),
+  };
 
   factory Pembayaran.fromMap(Map<String, Object?> data) => Pembayaran(
-        noUrut: Konversi.angka(data['noUrut']),
-        tanggalBayar: Konversi.tanggal(data['tanggalBayar']),
-        nominal: Konversi.angka(data['nominal']),
-        keterangan: (data['keterangan'] as String?) ?? '',
-      );
+    noUrut: Konversi.angka(data['noUrut']),
+    tanggalBayar: Konversi.tanggal(data['tanggalBayar']),
+    nominal: Konversi.angka(data['nominal']),
+    keterangan: (data['keterangan'] as String?) ?? '',
+  );
 }

@@ -62,23 +62,23 @@ class ProfilUsaha {
 
   /// Salinan dengan spasi di awal dan akhir isian dibuang.
   ProfilUsaha get dirapikan => ProfilUsaha(
-        nama: nama.trim(),
-        alamat: alamat.trim(),
-        whatsapp: whatsapp.trim(),
-        logo: logo,
-      );
+    nama: nama.trim(),
+    alamat: alamat.trim(),
+    whatsapp: whatsapp.trim(),
+    logo: logo,
+  );
 
   Map<String, dynamic> toMap() => {
-        'nama': nama.trim(),
-        'alamat': alamat.trim(),
-        'whatsapp': whatsapp.trim(),
-        'logo': logo,
-      };
+    'nama': nama.trim(),
+    'alamat': alamat.trim(),
+    'whatsapp': whatsapp.trim(),
+    'logo': logo,
+  };
 
   factory ProfilUsaha.fromMap(Map<String, dynamic> data) => ProfilUsaha(
-        nama: (data['nama'] as String?) ?? '',
-        alamat: (data['alamat'] as String?) ?? '',
-        whatsapp: (data['whatsapp'] as String?) ?? '',
-        logo: data['logo'] as String?,
-      );
+    nama: (data['nama'] as String?) ?? '',
+    alamat: (data['alamat'] as String?) ?? '',
+    whatsapp: (data['whatsapp'] as String?) ?? '',
+    logo: data['logo'] as String?,
+  );
 }

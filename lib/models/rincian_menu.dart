@@ -23,21 +23,21 @@ class RincianMenu {
   int get subtotal => jumlahPorsi * hargaPerPorsi;
 
   Map<String, Object?> toMap() => {
-        'noUrut': noUrut,
-        'tanggalKirim': Konversi.tanpaJam(tanggalKirim),
-        'namaMenu': namaMenu.trim(),
-        'jumlahPorsi': jumlahPorsi,
-        'hargaPerPorsi': hargaPerPorsi,
-        'subtotal': subtotal,
-      };
+    'noUrut': noUrut,
+    'tanggalKirim': Konversi.tanpaJam(tanggalKirim),
+    'namaMenu': namaMenu.trim(),
+    'jumlahPorsi': jumlahPorsi,
+    'hargaPerPorsi': hargaPerPorsi,
+    'subtotal': subtotal,
+  };
 
   factory RincianMenu.fromMap(Map<String, Object?> data) => RincianMenu(
-        noUrut: Konversi.angka(data['noUrut']),
-        tanggalKirim: Konversi.tanggal(data['tanggalKirim']),
-        namaMenu: (data['namaMenu'] as String?) ?? '',
-        jumlahPorsi: Konversi.angka(data['jumlahPorsi']),
-        hargaPerPorsi: Konversi.angka(data['hargaPerPorsi']),
-      );
+    noUrut: Konversi.angka(data['noUrut']),
+    tanggalKirim: Konversi.tanggal(data['tanggalKirim']),
+    namaMenu: (data['namaMenu'] as String?) ?? '',
+    jumlahPorsi: Konversi.angka(data['jumlahPorsi']),
+    hargaPerPorsi: Konversi.angka(data['hargaPerPorsi']),
+  );
 
   RincianMenu copyWith({
     int? noUrut,
@@ -45,12 +45,11 @@ class RincianMenu {
     String? namaMenu,
     int? jumlahPorsi,
     int? hargaPerPorsi,
-  }) =>
-      RincianMenu(
-        noUrut: noUrut ?? this.noUrut,
-        tanggalKirim: tanggalKirim ?? this.tanggalKirim,
-        namaMenu: namaMenu ?? this.namaMenu,
-        jumlahPorsi: jumlahPorsi ?? this.jumlahPorsi,
-        hargaPerPorsi: hargaPerPorsi ?? this.hargaPerPorsi,
-      );
+  }) => RincianMenu(
+    noUrut: noUrut ?? this.noUrut,
+    tanggalKirim: tanggalKirim ?? this.tanggalKirim,
+    namaMenu: namaMenu ?? this.namaMenu,
+    jumlahPorsi: jumlahPorsi ?? this.jumlahPorsi,
+    hargaPerPorsi: hargaPerPorsi ?? this.hargaPerPorsi,
+  );
 }

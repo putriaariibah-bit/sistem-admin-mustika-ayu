@@ -17,11 +17,11 @@ class TombolTambahPesanan extends StatelessWidget {
 
   /// Tombol selebar layar untuk bagian bawah halaman di ponsel.
   const TombolTambahPesanan.bawah({super.key, this.onPressed})
-      : _selebarLayar = true;
+    : _selebarLayar = true;
 
   /// Tombol ringkas untuk kepala halaman di layar lebar.
   const TombolTambahPesanan.ringkas({super.key, this.onPressed})
-      : _selebarLayar = false;
+    : _selebarLayar = false;
 
   @override
   Widget build(BuildContext context) {

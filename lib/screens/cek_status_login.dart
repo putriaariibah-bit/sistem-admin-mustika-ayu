@@ -63,11 +63,12 @@ class GerbangProfil extends StatefulWidget {
 class _GerbangProfilState extends State<GerbangProfil> {
   // Setiap profil yang diterima langsung disimpan ke ProfilUsaha.aktif,
   // sehingga kepala Dashboard dan nota ikut berubah.
-  late final Stream<ProfilUsaha?> _profil =
-      Repositori.instance.pantauProfil().map((p) {
-    if (p != null && p.lengkap) ProfilUsaha.aktif.value = p;
-    return p;
-  });
+  late final Stream<ProfilUsaha?> _profil = Repositori.instance
+      .pantauProfil()
+      .map((p) {
+        if (p != null && p.lengkap) ProfilUsaha.aktif.value = p;
+        return p;
+      });
 
   @override
   Widget build(BuildContext context) {

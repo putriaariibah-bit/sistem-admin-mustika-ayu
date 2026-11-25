@@ -39,8 +39,7 @@ class KartuPesananDaftar extends StatelessWidget {
   }
 
   String _kirim(DateTime hariIni) {
-    final tanggal = pesanan.rincian.map((r) => r.tanggalKirim).toList()
-      ..sort();
+    final tanggal = pesanan.rincian.map((r) => r.tanggalKirim).toList()..sort();
     if (tanggal.isEmpty) return '-';
     final awal = Format.tanggal(tanggal.first);
     final akhir = Format.tanggal(tanggal.last);
@@ -90,9 +89,7 @@ class KartuPesananDaftar extends StatelessWidget {
       ),
       backgroundColor: WidgetStateProperty.resolveWith((s) {
         if (garis) return Colors.white;
-        return s.contains(WidgetState.disabled)
-            ? AppTheme.garisKartu
-            : latar;
+        return s.contains(WidgetState.disabled) ? AppTheme.garisKartu : latar;
       }),
       foregroundColor: WidgetStateProperty.resolveWith((s) {
         if (garis) return AppTheme.primary;

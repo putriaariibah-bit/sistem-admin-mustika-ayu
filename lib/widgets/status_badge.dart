@@ -9,22 +9,22 @@ class WarnaStatus {
   WarnaStatus._();
 
   static Color utama(StatusPembayaran s) => switch (s) {
-        StatusPembayaran.belumBayar => AppTheme.bayarBelum,
-        StatusPembayaran.dp => AppTheme.bayarDP,
-        StatusPembayaran.lunas => AppTheme.bayarLunas,
-      };
+    StatusPembayaran.belumBayar => AppTheme.bayarBelum,
+    StatusPembayaran.dp => AppTheme.bayarDP,
+    StatusPembayaran.lunas => AppTheme.bayarLunas,
+  };
 
   static Color latar(StatusPembayaran s) => switch (s) {
-        StatusPembayaran.belumBayar => AppTheme.bayarBelumLatar,
-        StatusPembayaran.dp => AppTheme.bayarDPLatar,
-        StatusPembayaran.lunas => AppTheme.bayarLunasLatar,
-      };
+    StatusPembayaran.belumBayar => AppTheme.bayarBelumLatar,
+    StatusPembayaran.dp => AppTheme.bayarDPLatar,
+    StatusPembayaran.lunas => AppTheme.bayarLunasLatar,
+  };
 
   static IconData ikon(StatusPembayaran s) => switch (s) {
-        StatusPembayaran.belumBayar => Icons.schedule_outlined,
-        StatusPembayaran.dp => Icons.timelapse_outlined,
-        StatusPembayaran.lunas => Icons.check_circle_outline,
-      };
+    StatusPembayaran.belumBayar => Icons.schedule_outlined,
+    StatusPembayaran.dp => Icons.timelapse_outlined,
+    StatusPembayaran.lunas => Icons.check_circle_outline,
+  };
 }
 
 /// Badge status pembayaran: Belum bayar, DP, atau Lunas.

@@ -6,31 +6,34 @@ import 'package:kelola_katering/models/pembayaran.dart';
 import 'package:kelola_katering/models/pesanan.dart';
 import 'package:kelola_katering/models/rincian_menu.dart';
 
-RincianMenu _menu(int no, String nama, int porsi, int harga,
-        {DateTime? kirim}) =>
-    RincianMenu(
-      noUrut: no,
-      tanggalKirim: kirim ?? DateTime(2026, 11, 9),
-      namaMenu: nama,
-      jumlahPorsi: porsi,
-      hargaPerPorsi: harga,
-    );
+RincianMenu _menu(
+  int no,
+  String nama,
+  int porsi,
+  int harga, {
+  DateTime? kirim,
+}) => RincianMenu(
+  noUrut: no,
+  tanggalKirim: kirim ?? DateTime(2026, 11, 9),
+  namaMenu: nama,
+  jumlahPorsi: porsi,
+  hargaPerPorsi: harga,
+);
 
 Pesanan _pesanan({
   List<RincianMenu> rincian = const [],
   List<OngkosKirim> ongkir = const [],
   List<Pembayaran> bayar = const [],
   DateTime? nota,
-}) =>
-    Pesanan(
-      pelangganId: 'p1',
-      namaPelanggan: 'Pelanggan A',
-      tanggalNota: nota ?? DateTime(2026, 11, 3),
-      jenisPesanan: JenisPesanan.langgananHarian,
-      rincian: rincian,
-      ongkosKirim: ongkir,
-      pembayaran: bayar,
-    );
+}) => Pesanan(
+  pelangganId: 'p1',
+  namaPelanggan: 'Pelanggan A',
+  tanggalNota: nota ?? DateTime(2026, 11, 3),
+  jenisPesanan: JenisPesanan.langgananHarian,
+  rincian: rincian,
+  ongkosKirim: ongkir,
+  pembayaran: bayar,
+);
 
 /// Pesanan BB-11 dan BB-12: total menu Rp105.000, ongkir 4 x Rp9.000.
 final _pesananBB12 = _pesanan(
@@ -38,14 +41,19 @@ final _pesananBB12 = _pesanan(
   ongkir: [const OngkosKirim(noUrut: 1, jumlahKirim: 4, tarif: 9000)],
 );
 
-Pembayaran _bayar(int nominal) =>
-    Pembayaran(noUrut: 1, tanggalBayar: DateTime(2026, 11, 4), nominal: nominal);
+Pembayaran _bayar(int nominal) => Pembayaran(
+  noUrut: 1,
+  tanggalBayar: DateTime(2026, 11, 4),
+  nominal: nominal,
+);
 
 void main() {
   group('Validasi isian', () {
     test('BB-06: pesanan tanpa rincian ditolak', () {
-      expect(AturanPesanan.validasiRincian(_pesanan()),
-          'Rincian menu wajib diisi');
+      expect(
+        AturanPesanan.validasiRincian(_pesanan()),
+        'Rincian menu wajib diisi',
+      );
       expect(AturanPesanan.validasiRincian(_pesananBB12), isNull);
     });
     test('BB-07: jumlah porsi kosong ditolak', () {
@@ -90,8 +98,10 @@ void main() {
       expect(p.sisaTagihan, 0);
     });
     test('BB-18: pembayaran melebihi sisa tagihan ditolak', () {
-      expect(AturanPesanan.validasiNominal('141001', 141000),
-          'Nominal melebihi sisa tagihan');
+      expect(
+        AturanPesanan.validasiNominal('141001', 141000),
+        'Nominal melebihi sisa tagihan',
+      );
       expect(AturanPesanan.validasiNominal('141000', 141000), isNull);
     });
   });
@@ -110,11 +120,12 @@ void main() {
 
   test('BB-22: saringan dikirim hari ini', () {
     final hariIni = DateTime(2026, 11, 13);
-    final kirimHariIni =
-        _pesanan(rincian: [_menu(1, 'Rica ayam', 1, 20000, kirim: hariIni)]);
-    final kirimBesok = _pesanan(rincian: [
-      _menu(1, 'Rica ayam', 1, 20000, kirim: DateTime(2026, 11, 14)),
-    ]);
+    final kirimHariIni = _pesanan(
+      rincian: [_menu(1, 'Rica ayam', 1, 20000, kirim: hariIni)],
+    );
+    final kirimBesok = _pesanan(
+      rincian: [_menu(1, 'Rica ayam', 1, 20000, kirim: DateTime(2026, 11, 14))],
+    );
 
     expect(kirimHariIni.dikirimPada(hariIni), isTrue);
     expect(kirimBesok.dikirimPada(hariIni), isFalse);
@@ -124,11 +135,13 @@ void main() {
   group('Rekap bulanan', () {
     test('BB-23: hanya nota 31 Oktober yang masuk rekap Oktober', () {
       final oktober = _pesanan(
-          nota: DateTime(2026, 10, 31),
-          rincian: [_menu(1, 'Rica ayam', 1, 20000)]);
+        nota: DateTime(2026, 10, 31),
+        rincian: [_menu(1, 'Rica ayam', 1, 20000)],
+      );
       final november = _pesanan(
-          nota: DateTime(2026, 11, 1),
-          rincian: [_menu(1, 'Rica ayam', 1, 30000)]);
+        nota: DateTime(2026, 11, 1),
+        rincian: [_menu(1, 'Rica ayam', 1, 30000)],
+      );
 
       final rekap = AturanPesanan.rekap([oktober, november], 2026, 10);
       expect(rekap.jumlahPesanan, 1);

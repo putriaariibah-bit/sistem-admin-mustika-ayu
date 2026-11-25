@@ -87,18 +87,23 @@ class AturanPesanan {
       final a = '${nilaiLama ?? ''}';
       final b = '${nilaiBaru ?? ''}';
       if (a != b) {
-        hasil.add(RiwayatPerubahan(
-          waktu: waktu,
-          bagian: bagian,
-          nilaiLama: a,
-          nilaiBaru: b,
-        ));
+        hasil.add(
+          RiwayatPerubahan(
+            waktu: waktu,
+            bagian: bagian,
+            nilaiLama: a,
+            nilaiBaru: b,
+          ),
+        );
       }
     }
 
     catat('Nama pelanggan', lama.namaPelanggan, baru.namaPelanggan);
-    catat('Tanggal nota', Konversi.kunciTanggal(lama.tanggalNota),
-        Konversi.kunciTanggal(baru.tanggalNota));
+    catat(
+      'Tanggal nota',
+      Konversi.kunciTanggal(lama.tanggalNota),
+      Konversi.kunciTanggal(baru.tanggalNota),
+    );
     catat('Jenis pesanan', lama.jenisPesanan.label, baru.jenisPesanan.label);
 
     final rincianLama = {for (final r in lama.rincian) r.noUrut: r};
@@ -113,8 +118,11 @@ class AturanPesanan {
       } else if (a != null && b != null) {
         final menu = b.namaMenu;
         catat('Nama menu baris $no', a.namaMenu, b.namaMenu);
-        catat('Tanggal kirim $menu', Konversi.kunciTanggal(a.tanggalKirim),
-            Konversi.kunciTanggal(b.tanggalKirim));
+        catat(
+          'Tanggal kirim $menu',
+          Konversi.kunciTanggal(a.tanggalKirim),
+          Konversi.kunciTanggal(b.tanggalKirim),
+        );
         catat('Porsi $menu', a.jumlahPorsi, b.jumlahPorsi);
         catat('Harga per porsi $menu', a.hargaPerPorsi, b.hargaPerPorsi);
       }

@@ -35,8 +35,7 @@ Pesanan pesananUji({
     ],
     ongkosKirim: const [OngkosKirim(noUrut: 1, jumlahKirim: 4, tarif: 9000)],
     pembayaran: [
-      if (dibayar > 0)
-        Pembayaran(noUrut: 1, tanggalBayar: t, nominal: dibayar),
+      if (dibayar > 0) Pembayaran(noUrut: 1, tanggalBayar: t, nominal: dibayar),
     ],
   );
 }

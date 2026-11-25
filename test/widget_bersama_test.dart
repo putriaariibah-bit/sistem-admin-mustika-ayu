@@ -7,15 +7,15 @@ import 'package:kelola_katering/widgets/kotak_ikon.dart';
 import 'package:kelola_katering/widgets/logo_usaha.dart';
 import 'package:kelola_katering/widgets/status_badge.dart';
 
-Widget _bungkus(Widget anak) =>
-    MaterialApp(home: Scaffold(body: Center(child: anak)));
+Widget _bungkus(Widget anak) => MaterialApp(
+  home: Scaffold(body: Center(child: anak)),
+);
 
 void main() {
-  testWidgets('KotakIkon.status memakai warna pastel status Lunas',
-      (tester) async {
-    await tester.pumpWidget(
-      _bungkus(KotakIkon.status(StatusPembayaran.lunas)),
-    );
+  testWidgets('KotakIkon.status memakai warna pastel status Lunas', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_bungkus(KotakIkon.status(StatusPembayaran.lunas)));
 
     final kotak = tester.widget<Container>(
       find.descendant(

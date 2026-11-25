@@ -21,17 +21,17 @@ class OngkosKirim {
   int get subtotal => jumlahKirim * tarif;
 
   Map<String, Object?> toMap() => {
-        'noUrut': noUrut,
-        'keterangan': keterangan.trim(),
-        'jumlahKirim': jumlahKirim,
-        'tarif': tarif,
-        'subtotal': subtotal,
-      };
+    'noUrut': noUrut,
+    'keterangan': keterangan.trim(),
+    'jumlahKirim': jumlahKirim,
+    'tarif': tarif,
+    'subtotal': subtotal,
+  };
 
   factory OngkosKirim.fromMap(Map<String, Object?> data) => OngkosKirim(
-        noUrut: Konversi.angka(data['noUrut']),
-        keterangan: (data['keterangan'] as String?) ?? '',
-        jumlahKirim: Konversi.angka(data['jumlahKirim']),
-        tarif: Konversi.angka(data['tarif']),
-      );
+    noUrut: Konversi.angka(data['noUrut']),
+    keterangan: (data['keterangan'] as String?) ?? '',
+    jumlahKirim: Konversi.angka(data['jumlahKirim']),
+    tarif: Konversi.angka(data['tarif']),
+  );
 }

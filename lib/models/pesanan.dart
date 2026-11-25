@@ -14,8 +14,11 @@ enum JenisPesanan {
   /// Teks yang tampil dan disimpan di field jenisPesanan.
   final String label;
 
-  static JenisPesanan dariLabel(String? label) => JenisPesanan.values
-      .firstWhere((j) => j.label == label, orElse: () => JenisPesanan.sekaligus);
+  static JenisPesanan dariLabel(String? label) =>
+      JenisPesanan.values.firstWhere(
+        (j) => j.label == label,
+        orElse: () => JenisPesanan.sekaligus,
+      );
 }
 
 /// Status pembayaran (aturan 3.2.4 nomor 3).
@@ -105,30 +108,30 @@ class Pesanan {
   // ── Firestore ────────────────────────────────────────────────
 
   Map<String, Object?> toMap() => {
-        'pelangganId': pelangganId,
-        'namaPelanggan': namaPelanggan.trim(),
-        'tanggalNota': Konversi.tanpaJam(tanggalNota),
-        'jenisPesanan': jenisPesanan.label,
-        'rincian': [for (final r in rincian) r.toMap()],
-        'daftarTanggalKirim': daftarTanggalKirim,
-        'ongkosKirim': [for (final o in ongkosKirim) o.toMap()],
-        'pembayaran': [for (final p in pembayaran) p.toMap()],
-        'totalMenu': totalMenu,
-        'totalOngkir': totalOngkir,
-        'totalTagihan': totalTagihan,
-        'totalDibayar': totalDibayar,
-        'statusPembayaran': statusPembayaran.label,
-        'dibuatPada': dibuatPada,
-        'diubahPada': diubahPada,
-      };
+    'pelangganId': pelangganId,
+    'namaPelanggan': namaPelanggan.trim(),
+    'tanggalNota': Konversi.tanpaJam(tanggalNota),
+    'jenisPesanan': jenisPesanan.label,
+    'rincian': [for (final r in rincian) r.toMap()],
+    'daftarTanggalKirim': daftarTanggalKirim,
+    'ongkosKirim': [for (final o in ongkosKirim) o.toMap()],
+    'pembayaran': [for (final p in pembayaran) p.toMap()],
+    'totalMenu': totalMenu,
+    'totalOngkir': totalOngkir,
+    'totalTagihan': totalTagihan,
+    'totalDibayar': totalDibayar,
+    'statusPembayaran': statusPembayaran.label,
+    'dibuatPada': dibuatPada,
+    'diubahPada': diubahPada,
+  };
 
   /// Membaca dokumen pesanan. Field turunan tidak dibaca dari dokumen,
   /// tetapi dihitung ulang dari rincian, ongkos kirim, dan pembayaran.
   factory Pesanan.fromMap(String id, Map<String, Object?> data) {
     List<Map<String, Object?>> daftar(Object? nilai) => [
-          for (final item in (nilai as List?) ?? const [])
-            Map<String, Object?>.from(item as Map),
-        ];
+      for (final item in (nilai as List?) ?? const [])
+        Map<String, Object?>.from(item as Map),
+    ];
 
     return Pesanan(
       id: id,
@@ -136,7 +139,9 @@ class Pesanan {
       namaPelanggan: (data['namaPelanggan'] as String?) ?? '',
       tanggalNota: Konversi.tanggal(data['tanggalNota']),
       jenisPesanan: JenisPesanan.dariLabel(data['jenisPesanan'] as String?),
-      rincian: [for (final m in daftar(data['rincian'])) RincianMenu.fromMap(m)],
+      rincian: [
+        for (final m in daftar(data['rincian'])) RincianMenu.fromMap(m),
+      ],
       ongkosKirim: [
         for (final m in daftar(data['ongkosKirim'])) OngkosKirim.fromMap(m),
       ],
@@ -163,17 +168,16 @@ class Pesanan {
     List<Pembayaran>? pembayaran,
     DateTime? dibuatPada,
     DateTime? diubahPada,
-  }) =>
-      Pesanan(
-        id: id ?? this.id,
-        pelangganId: pelangganId ?? this.pelangganId,
-        namaPelanggan: namaPelanggan ?? this.namaPelanggan,
-        tanggalNota: tanggalNota ?? this.tanggalNota,
-        jenisPesanan: jenisPesanan ?? this.jenisPesanan,
-        rincian: rincian ?? this.rincian,
-        ongkosKirim: ongkosKirim ?? this.ongkosKirim,
-        pembayaran: pembayaran ?? this.pembayaran,
-        dibuatPada: dibuatPada ?? this.dibuatPada,
-        diubahPada: diubahPada ?? this.diubahPada,
-      );
+  }) => Pesanan(
+    id: id ?? this.id,
+    pelangganId: pelangganId ?? this.pelangganId,
+    namaPelanggan: namaPelanggan ?? this.namaPelanggan,
+    tanggalNota: tanggalNota ?? this.tanggalNota,
+    jenisPesanan: jenisPesanan ?? this.jenisPesanan,
+    rincian: rincian ?? this.rincian,
+    ongkosKirim: ongkosKirim ?? this.ongkosKirim,
+    pembayaran: pembayaran ?? this.pembayaran,
+    dibuatPada: dibuatPada ?? this.dibuatPada,
+    diubahPada: diubahPada ?? this.diubahPada,
+  );
 }

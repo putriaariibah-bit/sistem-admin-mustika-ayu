@@ -60,7 +60,8 @@ class Nota {
   });
 
   factory Nota.dariPesanan(Pesanan p) {
-    final urut = [...p.rincian]..sort((a, b) {
+    final urut = [...p.rincian]
+      ..sort((a, b) {
         final t = a.tanggalKirim.compareTo(b.tanggalKirim);
         return t != 0 ? t : a.noUrut.compareTo(b.noUrut);
       });
@@ -134,9 +135,9 @@ class Nota {
 
   /// Jumlah kolom Jumlah pada seluruh baris menu (sama dengan total menu).
   int get totalMenu => menu.fold(
-        0,
-        (total, k) => total + k.baris.fold(0, (s, b) => s + b.jumlah),
-      );
+    0,
+    (total, k) => total + k.baris.fold(0, (s, b) => s + b.jumlah),
+  );
 
   /// Jumlah kolom Jumlah pada baris ongkos kirim.
   int get totalOngkir => ongkosKirim.fold(0, (s, b) => s + b.jumlah);

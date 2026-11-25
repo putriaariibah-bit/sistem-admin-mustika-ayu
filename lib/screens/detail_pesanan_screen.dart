@@ -75,9 +75,11 @@ class DetailPesananScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Hapus pesanan ini?'),
-        content: Text('Pesanan ${p.namaPelanggan} tanggal '
-            '${Format.tanggal(p.tanggalNota)} akan dihapus dan tidak bisa '
-            'dikembalikan.'),
+        content: Text(
+          'Pesanan ${p.namaPelanggan} tanggal '
+          '${Format.tanggal(p.tanggalNota)} akan dihapus dan tidak bisa '
+          'dikembalikan.',
+        ),
         actions: [
           TextButton(
             key: const Key('batal-hapus'),
@@ -119,8 +121,9 @@ class DetailPesananScreen extends StatelessWidget {
             children: [
               Center(
                 child: ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
+                  constraints: const BoxConstraints(
+                    maxWidth: AppTheme.lebarKontenMaks,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(AppTheme.marginTepi),
                     child: Column(
@@ -130,8 +133,7 @@ class DetailPesananScreen extends StatelessWidget {
                         const SizedBox(height: AppTheme.spacing12),
                         _IsiDetail(
                           pesanan: p,
-                          onCatatPembayaran: () =>
-                              catatPembayaran(context, p),
+                          onCatatPembayaran: () => catatPembayaran(context, p),
                           onHapus: () => _hapus(context, p),
                         ),
                       ],
@@ -162,8 +164,9 @@ class _KartuRingkasan extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = pesanan;
     final lunas = p.statusPembayaran == StatusPembayaran.lunas;
-    final porsiDibayar =
-        p.totalTagihan == 0 ? 0.0 : p.totalDibayar / p.totalTagihan;
+    final porsiDibayar = p.totalTagihan == 0
+        ? 0.0
+        : p.totalDibayar / p.totalTagihan;
     const gayaKecil = TextStyle(
       fontSize: 12.5,
       color: AppTheme.textSecondary,
@@ -293,8 +296,9 @@ class _TombolBawah extends StatelessWidget {
         child: Center(
           heightFactor: 1,
           child: ConstrainedBox(
-            constraints:
-                const BoxConstraints(maxWidth: AppTheme.lebarKontenMaks),
+            constraints: const BoxConstraints(
+              maxWidth: AppTheme.lebarKontenMaks,
+            ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppTheme.marginTepi,
@@ -359,24 +363,24 @@ class _IsiDetail extends StatelessWidget {
   );
 
   Widget _baris(String judul, String keterangan, String nilai) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(judul, style: _gayaIsi),
-                  if (keterangan.isNotEmpty) Text(keterangan, style: _gayaKecil),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppTheme.spacing8),
-            Text(nilai, style: _gayaUang),
-          ],
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(judul, style: _gayaIsi),
+              if (keterangan.isNotEmpty) Text(keterangan, style: _gayaKecil),
+            ],
+          ),
         ),
-      );
+        const SizedBox(width: AppTheme.spacing8),
+        Text(nilai, style: _gayaUang),
+      ],
+    ),
+  );
 
   Widget _total(String label, int nilai, {bool tebal = false}) {
     final gaya = tebal
@@ -400,7 +404,9 @@ class _IsiDetail extends StatelessWidget {
     // Rincian dikelompokkan per tanggal kirim, seperti nota langganan.
     final perTanggal = <String, List<RincianMenu>>{};
     for (final r in p.rincian) {
-      perTanggal.putIfAbsent(Konversi.kunciTanggal(r.tanggalKirim), () => []).add(r);
+      perTanggal
+          .putIfAbsent(Konversi.kunciTanggal(r.tanggalKirim), () => [])
+          .add(r);
     }
     final tanggalUrut = perTanggal.keys.toList()..sort();
 
@@ -489,9 +495,9 @@ class _IsiDetail extends StatelessWidget {
               key: const Key('catat-pembayaran'),
               onPressed: p.sisaTagihan > 0 ? onCatatPembayaran : null,
               icon: const Icon(Icons.add, size: 20),
-              label: Text(p.sisaTagihan > 0
-                  ? 'Catat Pembayaran'
-                  : 'Sudah lunas'),
+              label: Text(
+                p.sisaTagihan > 0 ? 'Catat Pembayaran' : 'Sudah lunas',
+              ),
             ),
           ],
         ),
@@ -571,7 +577,9 @@ class _RiwayatPerubahan extends StatelessWidget {
                     const SizedBox(width: AppTheme.spacing8),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
+                        padding: const EdgeInsets.only(
+                          bottom: AppTheme.spacing12,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

@@ -177,10 +177,12 @@ class _MasukScreenState extends State<MasukScreen> {
       if (!mounted) return;
       // Email tidak terdaftar diberi pesan yang sama dengan berhasil agar
       // orang lain tidak dapat menebak email yang terdaftar.
-      _tampilkanPesan(e.code == 'user-not-found'
-          ? 'Jika email terdaftar, tautan untuk membuat kata sandi baru '
-              'sudah dikirim. Periksa kotak masuk atau folder spam.'
-          : ValidasiMasuk.pesanLupaSandi(e.code));
+      _tampilkanPesan(
+        e.code == 'user-not-found'
+            ? 'Jika email terdaftar, tautan untuk membuat kata sandi baru '
+                  'sudah dikirim. Periksa kotak masuk atau folder spam.'
+            : ValidasiMasuk.pesanLupaSandi(e.code),
+      );
     } catch (_) {
       if (mounted) _tampilkanPesan('Gagal mengirim email. Silakan coba lagi.');
     }

@@ -91,12 +91,12 @@ class ValidasiMasuk {
   /// Kode yang berarti pemilik menutup jendela Google sendiri; tidak
   /// perlu ditampilkan sebagai kesalahan.
   static bool dibatalkanPengguna(String kode) => const {
-        'popup-closed-by-user',
-        'cancelled-popup-request',
-        'web-context-canceled',
-        'canceled',
-        'user-cancelled',
-      }.contains(kode);
+    'popup-closed-by-user',
+    'cancelled-popup-request',
+    'web-context-canceled',
+    'canceled',
+    'user-cancelled',
+  }.contains(kode);
 
   /// Pesan kesalahan saat masuk dengan Google.
   static String pesanGoogle(String kode) {

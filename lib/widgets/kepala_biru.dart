@@ -42,24 +42,23 @@ class KepalaBiru extends StatelessWidget {
     required String tooltip,
     required IconData ikon,
     required VoidCallback onPressed,
-  }) =>
-      SizedBox(
-        width: 40,
-        height: 40,
-        child: IconButton(
-          key: key,
-          tooltip: tooltip,
-          padding: EdgeInsets.zero,
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.white.withValues(alpha: 0.14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.sudutTombol + 2),
-            ),
-          ),
-          icon: Icon(ikon, size: 19, color: Colors.white),
-          onPressed: onPressed,
+  }) => SizedBox(
+    width: 40,
+    height: 40,
+    child: IconButton(
+      key: key,
+      tooltip: tooltip,
+      padding: EdgeInsets.zero,
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.white.withValues(alpha: 0.14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.sudutTombol + 2),
         ),
-      );
+      ),
+      icon: Icon(ikon, size: 19, color: Colors.white),
+      onPressed: onPressed,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

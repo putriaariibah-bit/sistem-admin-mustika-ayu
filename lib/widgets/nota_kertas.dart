@@ -74,18 +74,11 @@ class NotaKertas extends StatelessWidget {
     TextStyle gaya, {
     Alignment rata = Alignment.centerLeft,
     Key? kunci,
-  }) =>
-      FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: rata,
-        child: Text(
-          isi,
-          key: kunci,
-          style: gaya,
-          maxLines: 1,
-          softWrap: false,
-        ),
-      );
+  }) => FittedBox(
+    fit: BoxFit.scaleDown,
+    alignment: rata,
+    child: Text(isi, key: kunci, style: gaya, maxLines: 1, softWrap: false),
+  );
 
   Widget _kepala() {
     final usaha = _identitas;
@@ -129,103 +122,103 @@ class NotaKertas extends StatelessWidget {
   }
 
   Widget _judulNota() => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'NOTA',
-                  style: _tebal.copyWith(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Wrap(
-                  children: [
-                    Text('Tanggal nota: ', style: _redup),
-                    Text(
-                      Format.tanggalAngka(nota.tanggalNota),
-                      key: const Key('nota-tanggal'),
-                      style: _tebal,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppTheme.spacing8),
-          // Badge boleh mengecil agar tidak meluber di layar sempit.
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Status Pembayaran:',
-                  style: _redup,
-                  textAlign: TextAlign.right,
-                ),
-                const SizedBox(height: 4),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: StatusBadge(nota.status),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-
-  Widget _kotak(String judul, List<Widget> isi) => Container(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppTheme.garis),
-          borderRadius: BorderRadius.circular(10),
-        ),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(judul, style: _labelKecil),
-            const SizedBox(height: 4),
-            ...isi,
+            Text(
+              'NOTA',
+              style: _tebal.copyWith(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Wrap(
+              children: [
+                Text('Tanggal nota: ', style: _redup),
+                Text(
+                  Format.tanggalAngka(nota.tanggalNota),
+                  key: const Key('nota-tanggal'),
+                  style: _tebal,
+                ),
+              ],
+            ),
           ],
         ),
-      );
+      ),
+      const SizedBox(width: AppTheme.spacing8),
+      // Badge boleh mengecil agar tidak meluber di layar sempit.
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              'Status Pembayaran:',
+              style: _redup,
+              textAlign: TextAlign.right,
+            ),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: StatusBadge(nota.status),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  Widget _kotak(String judul, List<Widget> isi) => Container(
+    padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+    decoration: BoxDecoration(
+      border: Border.all(color: AppTheme.garis),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(judul, style: _labelKecil),
+        const SizedBox(height: 4),
+        ...isi,
+      ],
+    ),
+  );
 
   Widget _isiInfo(String label, String nilai, {Key? kunci}) => Wrap(
-        children: [
-          Text('$label ', style: _redup),
-          Text(nilai, key: kunci, style: _teks),
-        ],
-      );
+    children: [
+      Text('$label ', style: _redup),
+      Text(nilai, key: kunci, style: _teks),
+    ],
+  );
 
   Widget _kotakPelangganDanPesanan() => IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _kotak('PELANGGAN', [
-                Text(
-                  nota.namaPelanggan,
-                  key: const Key('nota-nama'),
-                  style: _tebal.copyWith(fontSize: 13.5),
-                ),
-              ]),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: _kotak('PELANGGAN', [
+            Text(
+              nota.namaPelanggan,
+              key: const Key('nota-nama'),
+              style: _tebal.copyWith(fontSize: 13.5),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _kotak('INFORMASI PESANAN', [
-                _isiInfo('Jenis:', nota.jenis, kunci: const Key('nota-jenis')),
-                _isiInfo('Tanggal kirim:', nota.teksTanggalKirim),
-              ]),
-            ),
-          ],
+          ]),
         ),
-      );
+        const SizedBox(width: 10),
+        Expanded(
+          child: _kotak('INFORMASI PESANAN', [
+            _isiInfo('Jenis:', nota.jenis, kunci: const Key('nota-jenis')),
+            _isiInfo('Tanggal kirim:', nota.teksTanggalKirim),
+          ]),
+        ),
+      ],
+    ),
+  );
 
   /// Satu baris tabel dengan empat kolom.
   Widget _baris(
@@ -234,28 +227,27 @@ class NotaKertas extends StatelessWidget {
     Color warnaGaris = _garisTipis,
     double atas = 9,
     double bawah = 9,
-  }) =>
-      Container(
-        padding: EdgeInsets.only(top: atas, bottom: bawah),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: warnaGaris, width: tebalGaris),
+  }) => Container(
+    padding: EdgeInsets.only(top: atas, bottom: bawah),
+    decoration: BoxDecoration(
+      border: Border(
+        bottom: BorderSide(color: warnaGaris, width: tebalGaris),
+      ),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < sel.length; i++)
+          Expanded(
+            flex: _lebarKolom[i],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: sel[i],
+            ),
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < sel.length; i++)
-              Expanded(
-                flex: _lebarKolom[i],
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: sel[i],
-                ),
-              ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 
   Widget _barisRincian(BarisNota b, {bool ongkir = false}) {
     final gaya = ongkir ? _teks.copyWith(color: AppTheme.textSecondary) : _teks;
@@ -273,60 +265,62 @@ class NotaKertas extends StatelessWidget {
   }
 
   Widget _subjudul(String isi) => Padding(
-        padding: const EdgeInsets.fromLTRB(5, 10, 5, 2),
-        child: _satuBaris(
-          isi,
-          _tebal.copyWith(fontSize: 11.5, color: AppTheme.primary),
-        ),
-      );
+    padding: const EdgeInsets.fromLTRB(5, 10, 5, 2),
+    child: _satuBaris(
+      isi,
+      _tebal.copyWith(fontSize: 11.5, color: AppTheme.primary),
+    ),
+  );
 
   Widget _tabel() => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _baris(
-            [
-              _satuBaris('BANYAK', _labelKecil),
-              _satuBaris('NAMA', _labelKecil),
-              _satuBaris('HARGA', _labelKecil, rata: Alignment.centerRight),
-              _satuBaris('JUMLAH', _labelKecil, rata: Alignment.centerRight),
-            ],
-            tebalGaris: 2,
-            warnaGaris: AppTheme.garis,
-            atas: 6,
-            bawah: 7,
-          ),
-          for (final k in nota.menu) ...[
-            if (nota.tampilkanTanggalKirim)
-              _subjudul('Kirim ${Format.tanggalAngka(k.tanggalKirim)}'),
-            for (final b in k.baris) _barisRincian(b),
-          ],
-          for (final b in nota.ongkosKirim) _barisRincian(b, ongkir: true),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      _baris(
+        [
+          _satuBaris('BANYAK', _labelKecil),
+          _satuBaris('NAMA', _labelKecil),
+          _satuBaris('HARGA', _labelKecil, rata: Alignment.centerRight),
+          _satuBaris('JUMLAH', _labelKecil, rata: Alignment.centerRight),
         ],
-      );
+        tebalGaris: 2,
+        warnaGaris: AppTheme.garis,
+        atas: 6,
+        bawah: 7,
+      ),
+      for (final k in nota.menu) ...[
+        if (nota.tampilkanTanggalKirim)
+          _subjudul('Kirim ${Format.tanggalAngka(k.tanggalKirim)}'),
+        for (final b in k.baris) _barisRincian(b),
+      ],
+      for (final b in nota.ongkosKirim) _barisRincian(b, ongkir: true),
+    ],
+  );
 
-  Widget _barisTotal(String label, String nilai, TextStyle gayaNilai,
-          {Key? kunci}) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Text(label, style: _teks.copyWith(color: AppTheme.textSecondary)),
-            const SizedBox(width: AppTheme.spacing8),
-            Expanded(
-              child: _satuBaris(
-                nilai,
-                gayaNilai.copyWith(fontFeatures: AppTheme.angkaRata),
-                rata: Alignment.centerRight,
-                kunci: kunci,
-              ),
-            ),
-          ],
+  Widget _barisTotal(
+    String label,
+    String nilai,
+    TextStyle gayaNilai, {
+    Key? kunci,
+  }) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Text(label, style: _teks.copyWith(color: AppTheme.textSecondary)),
+        const SizedBox(width: AppTheme.spacing8),
+        Expanded(
+          child: _satuBaris(
+            nilai,
+            gayaNilai.copyWith(fontFeatures: AppTheme.angkaRata),
+            rata: Alignment.centerRight,
+            kunci: kunci,
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   Widget _total() {
-    final warnaSisa =
-        nota.sisa > 0 ? AppTheme.bayarBelum : AppTheme.bayarLunas;
+    final warnaSisa = nota.sisa > 0 ? AppTheme.bayarBelum : AppTheme.bayarLunas;
     return Row(
       children: [
         const Spacer(flex: 2),
@@ -388,28 +382,28 @@ class NotaKertas extends StatelessWidget {
   }
 
   Widget _terimaKasih() => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: _latarTerima,
-          border: Border.all(color: _garisTerima),
-          borderRadius: BorderRadius.circular(10),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    decoration: BoxDecoration(
+      color: _latarTerima,
+      border: Border.all(color: _garisTerima),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      children: [
+        Text(
+          'Terima kasih atas pesanan Anda di ${_identitas.nama}.',
+          textAlign: TextAlign.center,
+          style: _teks.copyWith(fontWeight: FontWeight.w600),
         ),
-        child: Column(
-          children: [
-            Text(
-              'Terima kasih atas pesanan Anda di ${_identitas.nama}.',
-              textAlign: TextAlign.center,
-              style: _teks.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Semoga hidangan kami memuaskan.',
-              textAlign: TextAlign.center,
-              style: _redup.copyWith(fontSize: 11),
-            ),
-          ],
+        const SizedBox(height: 2),
+        Text(
+          'Semoga hidangan kami memuaskan.',
+          textAlign: TextAlign.center,
+          style: _redup.copyWith(fontSize: 11),
         ),
-      );
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
