@@ -65,3 +65,33 @@ class GambarLogo extends StatelessWidget {
     );
   }
 }
+
+/// Logo aplikasi KelolaKatering di halaman Masuk: kotak biru bergradasi
+/// berisi ikon makanan. Dipakai sebelum pemilik masuk, saat profil usaha
+/// belum diketahui.
+class LogoAplikasi extends StatelessWidget {
+  final double ukuran;
+
+  const LogoAplikasi({super.key, this.ukuran = 72});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: ukuran,
+      height: ukuran,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.primary, Color(0xFF2D5486)],
+        ),
+        borderRadius: BorderRadius.circular(ukuran * 0.27),
+      ),
+      child: Icon(
+        Icons.restaurant_menu,
+        color: Colors.white,
+        size: ukuran * 0.5,
+      ),
+    );
+  }
+}

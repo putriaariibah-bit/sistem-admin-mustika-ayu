@@ -114,69 +114,70 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, aturDialog) {
           Widget tombolMata() => IconButton(
-                tooltip: tersembunyi
-                    ? 'Tampilkan kata sandi'
-                    : 'Sembunyikan kata sandi',
-                icon: Icon(
-                  tersembunyi
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                ),
-                onPressed: () => aturDialog(() => tersembunyi = !tersembunyi),
-              );
+            tooltip: tersembunyi
+                ? 'Tampilkan kata sandi'
+                : 'Sembunyikan kata sandi',
+            icon: Icon(
+              tersembunyi
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+            ),
+            onPressed: () => aturDialog(() => tersembunyi = !tersembunyi),
+          );
           return AlertDialog(
-        title: const Text('Atur kata sandi'),
-        content: Form(
-          key: kunciForm,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Setelah kata sandi diatur, akun ini bisa dimasuki dengan '
-                'Google maupun email dan kata sandi.',
+            title: const Text('Atur kata sandi'),
+            content: Form(
+              key: kunciForm,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Setelah kata sandi diatur, akun ini bisa dimasuki dengan '
+                    'Google maupun email dan kata sandi.',
+                  ),
+                  const SizedBox(height: AppTheme.spacing12),
+                  TextFormField(
+                    key: const Key('sandi-baru'),
+                    controller: sandi,
+                    obscureText: tersembunyi,
+                    decoration: InputDecoration(
+                      labelText: 'Kata sandi (minimal 6 karakter)',
+                      suffixIcon: tombolMata(),
+                    ),
+                    validator: ValidasiMasuk.kataSandiBaru,
+                  ),
+                  const SizedBox(height: AppTheme.spacing12),
+                  TextFormField(
+                    key: const Key('ulangi-sandi-baru'),
+                    controller: ulangi,
+                    obscureText: tersembunyi,
+                    decoration: InputDecoration(
+                      labelText: 'Ulangi kata sandi',
+                      suffixIcon: tombolMata(),
+                    ),
+                    validator: (v) =>
+                        ValidasiMasuk.ulangiKataSandi(v, sandi.text),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppTheme.spacing12),
-              TextFormField(
-                key: const Key('sandi-baru'),
-                controller: sandi,
-                obscureText: tersembunyi,
-                decoration: InputDecoration(
-                  labelText: 'Kata sandi (minimal 6 karakter)',
-                  suffixIcon: tombolMata(),
-                ),
-                validator: ValidasiMasuk.kataSandiBaru,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Batal'),
               ),
-              const SizedBox(height: AppTheme.spacing12),
-              TextFormField(
-                key: const Key('ulangi-sandi-baru'),
-                controller: ulangi,
-                obscureText: tersembunyi,
-                decoration: InputDecoration(
-                  labelText: 'Ulangi kata sandi',
-                  suffixIcon: tombolMata(),
-                ),
-                validator: (v) => ValidasiMasuk.ulangiKataSandi(v, sandi.text),
+              FilledButton(
+                key: const Key('simpan-sandi-baru'),
+                onPressed: () {
+                  if (kunciForm.currentState!.validate()) {
+                    Navigator.pop(ctx, sandi.text);
+                  }
+                },
+                child: const Text('Simpan'),
               ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          FilledButton(
-            key: const Key('simpan-sandi-baru'),
-            onPressed: () {
-              if (kunciForm.currentState!.validate()) {
-                Navigator.pop(ctx, sandi.text);
-              }
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      );
+          );
         },
       ),
     );
@@ -193,7 +194,8 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
     } on FirebaseAuthException catch (e) {
       if (mounted) _tampilkanPesan(_pesanAturSandi(e.code));
     } catch (_) {
-      if (mounted) _tampilkanPesan('Kata sandi gagal diatur. Silakan coba lagi.');
+      if (mounted)
+        _tampilkanPesan('Kata sandi gagal diatur. Silakan coba lagi.');
     }
   }
 

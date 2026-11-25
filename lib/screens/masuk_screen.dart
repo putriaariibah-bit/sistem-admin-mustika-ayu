@@ -226,10 +226,10 @@ class _MasukScreenState extends State<MasukScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Center(child: LogoUsaha(ukuran: 72)),
+                    const Center(child: LogoAplikasi(ukuran: 72)),
                     const SizedBox(height: AppTheme.spacing16),
                     const Text(
-                      'Mustika Ayu Catering',
+                      'KelolaKatering',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: AppTheme.judul,
@@ -239,7 +239,8 @@ class _MasukScreenState extends State<MasukScreen> {
                     ),
                     const SizedBox(height: AppTheme.spacing8),
                     const Text(
-                      'Masuk untuk mencatat pesanan dan melihat rekap.',
+                      'Catat pesanan katering, buat nota, dan lihat rekap '
+                      'pendapatan.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: AppTheme.isi,

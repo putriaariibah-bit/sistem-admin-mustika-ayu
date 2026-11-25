@@ -17,7 +17,9 @@ void main() {
         home: MasukScreen(fungsiMasuk: (email, sandi) async {}),
       ),
     );
-    expect(find.byType(LogoUsaha), findsOneWidget);
+    expect(find.byType(LogoAplikasi), findsOneWidget);
+    expect(find.text('KelolaKatering'), findsOneWidget);
+    expect(find.text('Mustika Ayu Catering'), findsNothing);
   });
 
   testWidgets('Sidebar menampilkan logo dan menu aktif berlatar muda', (

@@ -24,7 +24,7 @@ Future<void> main() async {
   runApp(const KelolaKateringApp());
 }
 
-/// Root widget aplikasi Mustika Ayu Catering.
+/// Root widget aplikasi KelolaKatering.
 ///
 /// Menggunakan [AppTheme.light] sebagai tema Material 3
 /// dan [CekStatusLogin] sebagai halaman awal.
@@ -41,7 +41,7 @@ class KelolaKateringApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mustika Ayu Catering',
+      title: 'KelolaKatering',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: halamanAwal,
