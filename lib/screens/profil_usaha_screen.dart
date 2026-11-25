@@ -108,9 +108,23 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
     final sandi = TextEditingController();
     final ulangi = TextEditingController();
     final kunciForm = GlobalKey<FormState>();
+    var tersembunyi = true;
     final kataSandi = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, aturDialog) {
+          Widget tombolMata() => IconButton(
+                tooltip: tersembunyi
+                    ? 'Tampilkan kata sandi'
+                    : 'Sembunyikan kata sandi',
+                icon: Icon(
+                  tersembunyi
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
+                onPressed: () => aturDialog(() => tersembunyi = !tersembunyi),
+              );
+          return AlertDialog(
         title: const Text('Atur kata sandi'),
         content: Form(
           key: kunciForm,
@@ -126,9 +140,10 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
               TextFormField(
                 key: const Key('sandi-baru'),
                 controller: sandi,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: tersembunyi,
+                decoration: InputDecoration(
                   labelText: 'Kata sandi (minimal 6 karakter)',
+                  suffixIcon: tombolMata(),
                 ),
                 validator: ValidasiMasuk.kataSandiBaru,
               ),
@@ -136,9 +151,11 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
               TextFormField(
                 key: const Key('ulangi-sandi-baru'),
                 controller: ulangi,
-                obscureText: true,
-                decoration:
-                    const InputDecoration(labelText: 'Ulangi kata sandi'),
+                obscureText: tersembunyi,
+                decoration: InputDecoration(
+                  labelText: 'Ulangi kata sandi',
+                  suffixIcon: tombolMata(),
+                ),
                 validator: (v) => ValidasiMasuk.ulangiKataSandi(v, sandi.text),
               ),
             ],
@@ -159,6 +176,8 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
             child: const Text('Simpan'),
           ),
         ],
+      );
+        },
       ),
     );
     if (kataSandi == null || !mounted) return;
