@@ -87,4 +87,31 @@ class ValidasiMasuk {
         return 'Gagal mengirim email. Silakan coba lagi.';
     }
   }
+
+  /// Kode yang berarti pemilik menutup jendela Google sendiri; tidak
+  /// perlu ditampilkan sebagai kesalahan.
+  static bool dibatalkanPengguna(String kode) => const {
+        'popup-closed-by-user',
+        'cancelled-popup-request',
+        'web-context-canceled',
+        'canceled',
+        'user-cancelled',
+      }.contains(kode);
+
+  /// Pesan kesalahan saat masuk dengan Google.
+  static String pesanGoogle(String kode) {
+    switch (kode) {
+      case 'account-exists-with-different-credential':
+        return 'Email ini sudah terdaftar dengan kata sandi. '
+            'Masuk dengan email dan kata sandi.';
+      case 'popup-blocked':
+        return 'Jendela Google diblokir browser. Izinkan pop-up lalu coba lagi.';
+      case 'operation-not-allowed':
+        return 'Masuk dengan Google belum diaktifkan.';
+      case 'network-request-failed':
+        return 'Tidak dapat terhubung. Periksa koneksi internet.';
+      default:
+        return 'Gagal masuk dengan Google. Silakan coba lagi.';
+    }
+  }
 }

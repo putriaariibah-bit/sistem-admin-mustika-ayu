@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/theme.dart';
@@ -10,7 +11,8 @@ import 'buat_akun_screen.dart';
 ///
 /// Sesuai Bab III, pemilik masuk dengan email dan kata sandi. Sebagai
 /// pengembangan lanjutan, halaman ini juga punya tautan "Lupa kata
-/// sandi?" dan "Buat Akun" agar pemilik katering lain dapat mendaftar.
+/// sandi?", tombol "Masuk dengan Google", dan "Buat Akun" agar pemilik
+/// katering lain dapat mendaftar.
 ///
 /// Pemeriksaan email dan kata sandi dilakukan oleh Firebase Authentication.
 /// Setelah berhasil masuk, [CekStatusLogin] otomatis menampilkan Dashboard.
@@ -25,11 +27,15 @@ class MasukScreen extends StatefulWidget {
   /// Pengirim email ganti kata sandi. Bawaannya Firebase Authentication.
   final Future<void> Function(String email)? fungsiLupaSandi;
 
+  /// Masuk dengan akun Google. Bawaannya Firebase Authentication.
+  final Future<void> Function()? fungsiMasukGoogle;
+
   const MasukScreen({
     super.key,
     this.fungsiMasuk,
     this.fungsiBuatAkun,
     this.fungsiLupaSandi,
+    this.fungsiMasukGoogle,
   });
 
   @override
@@ -63,6 +69,40 @@ class _MasukScreenState extends State<MasukScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(pesan)));
+  }
+
+  /// Web memakai jendela pop-up Google; Android memakai alur penyedia
+  /// Firebase (perlu SHA-1 aplikasi terdaftar di Firebase).
+  Future<void> _masukGoogleFirebase() async {
+    final penyedia = GoogleAuthProvider()
+      ..setCustomParameters({'prompt': 'select_account'});
+    if (kIsWeb) {
+      await FirebaseAuth.instance.signInWithPopup(penyedia);
+    } else {
+      await FirebaseAuth.instance.signInWithProvider(penyedia);
+    }
+  }
+
+  Future<void> _tekanMasukGoogle() async {
+    setState(() {
+      _pesanGagal = null;
+      _sedangMemproses = true;
+    });
+    try {
+      await (widget.fungsiMasukGoogle ?? _masukGoogleFirebase)();
+    } on FirebaseAuthException catch (e) {
+      if (mounted && !ValidasiMasuk.dibatalkanPengguna(e.code)) {
+        setState(() => _pesanGagal = ValidasiMasuk.pesanGoogle(e.code));
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _pesanGagal = 'Gagal masuk dengan Google. Silakan coba lagi.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sedangMemproses = false);
+    }
   }
 
   Future<void> _kirimResetFirebase(String email) =>
@@ -275,6 +315,45 @@ class _MasukScreenState extends State<MasukScreen> {
                               ),
                             )
                           : const Text('Masuk'),
+                    ),
+                    const SizedBox(height: AppTheme.spacing16),
+                    const Row(
+                      children: [
+                        Expanded(child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppTheme.spacing8,
+                          ),
+                          child: Text(
+                            'atau',
+                            style: TextStyle(
+                              fontSize: AppTheme.keterangan,
+                              color: AppTheme.textTersier,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.spacing16),
+                    OutlinedButton(
+                      key: const Key('tombol-masuk-google'),
+                      onPressed: _sedangMemproses ? null : _tekanMasukGoogle,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'G',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF4285F4),
+                            ),
+                          ),
+                          SizedBox(width: AppTheme.spacing8),
+                          Text('Masuk dengan Google'),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: AppTheme.spacing12),
                     Wrap(

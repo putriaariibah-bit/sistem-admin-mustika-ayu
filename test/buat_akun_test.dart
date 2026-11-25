@@ -94,4 +94,32 @@ void main() {
     expect(find.textContaining('tautan untuk membuat kata sandi baru'),
         findsOneWidget);
   });
+
+  testWidgets('Tombol Masuk dengan Google memanggil fungsi login Google',
+      (tester) async {
+    var dipanggil = false;
+    await tester.pumpWidget(_bungkus(MasukScreen(
+      fungsiMasuk: (e, s) async {},
+      fungsiMasukGoogle: () async => dipanggil = true,
+    )));
+
+    await tester.tap(find.byKey(const Key('tombol-masuk-google')));
+    await tester.pump();
+
+    expect(dipanggil, isTrue);
+  });
+
+  testWidgets('Jendela Google yang ditutup tidak menampilkan pesan gagal',
+      (tester) async {
+    await tester.pumpWidget(_bungkus(MasukScreen(
+      fungsiMasuk: (e, s) async {},
+      fungsiMasukGoogle: () async =>
+          throw FirebaseAuthException(code: 'popup-closed-by-user'),
+    )));
+
+    await tester.tap(find.byKey(const Key('tombol-masuk-google')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('masuk-pesan-gagal')), findsNothing);
+  });
 }
