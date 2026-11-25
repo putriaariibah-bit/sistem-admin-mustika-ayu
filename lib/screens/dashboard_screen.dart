@@ -7,6 +7,7 @@ import '../models/profil_usaha.dart';
 import '../utils/format.dart';
 import '../utils/theme.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/kepala_biru.dart';
 import '../widgets/kotak_ikon.dart';
 import '../widgets/logo_usaha.dart';
 import '../widgets/pesanan_card.dart';
@@ -61,31 +62,24 @@ class DashboardScreen extends StatelessWidget {
         if (p.dikirimPada(sekarang)) p,
     ];
 
+    final tepi = lebar ? AppTheme.spacing24 : AppTheme.marginTepi;
+
     final isi = <Widget>[
+      _KepalaDashboard(
+        sekarang: sekarang,
+        rekap: rekap,
+        tepi: tepi,
+        onKeluar: lebar ? null : onKeluar,
+        onProfil: lebar ? null : onProfil,
+      ),
       Padding(
-        padding: EdgeInsets.fromLTRB(
-          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
-          lebar ? AppTheme.spacing24 : AppTheme.spacing12,
-          lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
-          0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _KepalaDashboard(
-              sekarang: sekarang,
-              onKeluar: lebar ? null : onKeluar,
-              onProfil: lebar ? null : onProfil,
-            ),
-            const SizedBox(height: AppTheme.spacing16),
-            _KartuKiriman(
-              sekarang: sekarang,
-              pesanan: kirimHariIni,
-              batas: _batasKirim,
-              memuat: memuat,
-              onPesananTap: onPesananTap,
-            ),
-          ],
+        padding: EdgeInsets.fromLTRB(tepi, AppTheme.spacing16, tepi, 0),
+        child: _KartuKiriman(
+          sekarang: sekarang,
+          pesanan: kirimHariIni,
+          batas: _batasKirim,
+          memuat: memuat,
+          onPesananTap: onPesananTap,
         ),
       ),
       Padding(
@@ -108,64 +102,6 @@ class DashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing16),
             ],
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Pembayaran ${Format.bulanTahun(sekarang.year, sekarang.month)}',
-                    style: _gayaSeksi,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: AppTheme.garisKartu),
-                  ),
-                  child: Text(
-                    '${rekap.jumlahPesanan} pesanan',
-                    key: const Key('ringkasan-bulan-ini'),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppTheme.spacing12 - 2),
-            Row(
-              children: [
-                for (final s in StatusPembayaran.values) ...[
-                  if (s != StatusPembayaran.values.first)
-                    const SizedBox(width: AppTheme.spacing12 - 2),
-                  Expanded(
-                    child: _KotakStatus(
-                      key: Key('ringkasan-${s.name}'),
-                      status: s,
-                      jumlah: rekap.jumlahPerStatus[s] ?? 0,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            if (rekap.sisaTagihan > 0) ...[
-              const SizedBox(height: AppTheme.spacing8),
-              Text(
-                'Belum diterima bulan ini: ${Format.rupiah(rekap.sisaTagihan)}',
-                style: const TextStyle(
-                  fontSize: AppTheme.keterangan,
-                  color: AppTheme.textSecondary,
-                  fontFeatures: AppTheme.angkaRata,
-                ),
-              ),
-            ],
-            const SizedBox(height: AppTheme.spacing24 - 4),
             Row(
               children: [
                 const Expanded(
@@ -209,102 +145,176 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-/// Kepala Dashboard: logo, sapaan dan tanggal, nama usaha, tombol Keluar.
+/// Kepala Dashboard berwarna biru: logo dan nama usaha, sapaan dan
+/// tanggal, tombol Profil Usaha dan Keluar, lalu ringkasan pembayaran
+/// bulan berjalan (belum diterima dan jumlah pesanan per status).
 class _KepalaDashboard extends StatelessWidget {
   final DateTime sekarang;
+  final RekapBulanan rekap;
+  final double tepi;
   final VoidCallback? onKeluar;
   final VoidCallback? onProfil;
 
   const _KepalaDashboard({
     required this.sekarang,
+    required this.rekap,
+    required this.tepi,
     this.onKeluar,
     this.onProfil,
   });
 
-  Widget _tombolKepala({
-    required Key key,
-    required String tooltip,
-    required IconData ikon,
-    required VoidCallback onPressed,
-  }) =>
-      SizedBox(
-        width: 40,
-        height: 40,
-        child: IconButton.outlined(
-          key: key,
-          tooltip: tooltip,
-          padding: EdgeInsets.zero,
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.white,
-            side: const BorderSide(color: AppTheme.garisKartu),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.sudutTombol),
-            ),
-          ),
-          icon: Icon(ikon, size: 18, color: AppTheme.textSecondary),
-          onPressed: onPressed,
-        ),
-      );
-
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: ValueListenableBuilder<ProfilUsaha>(
-        valueListenable: ProfilUsaha.aktif,
-        builder: (context, profil, _) => Row(
-        children: [
-          LogoUsaha(profil: profil.lengkap ? profil : null),
-          const SizedBox(width: AppTheme.spacing12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${Format.sapaan(sekarang)} · ${Format.tanggalPanjang(sekarang)}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12.5,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  profil.lengkap
-                      ? profil.nama.trim()
-                      : ProfilUsaha.bawaan.nama,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (onProfil != null) ...[
-            const SizedBox(width: AppTheme.spacing8),
-            _tombolKepala(
+    return ValueListenableBuilder<ProfilUsaha>(
+      valueListenable: ProfilUsaha.aktif,
+      builder: (context, profil, _) => KepalaBiru(
+        tepi: tepi,
+        depan: LogoUsaha(profil: profil.lengkap ? profil : null, ukuran: 42),
+        judul: profil.lengkap ? profil.nama.trim() : ProfilUsaha.bawaan.nama,
+        subjudul:
+            '${Format.sapaan(sekarang)} · ${Format.tanggalPanjang(sekarang)}',
+        aksi: [
+          if (onProfil != null)
+            KepalaBiru.tombol(
               key: const Key('tombol-profil-usaha'),
               tooltip: 'Profil usaha',
               ikon: Icons.storefront_outlined,
               onPressed: onProfil!,
             ),
-          ],
-          if (onKeluar != null) ...[
-            const SizedBox(width: AppTheme.spacing8),
-            _tombolKepala(
+          if (onKeluar != null)
+            KepalaBiru.tombol(
               key: const Key('tombol-keluar'),
               tooltip: 'Keluar',
               ikon: Icons.logout,
               onPressed: onKeluar!,
             ),
-          ],
+        ],
+        bawah: _RingkasanBulan(sekarang: sekarang, rekap: rekap),
+      ),
+    );
+  }
+}
+
+/// Kotak transparan di kepala Dashboard: tagihan yang belum diterima
+/// bulan ini dan jumlah pesanan Belum bayar, DP, dan Lunas.
+class _RingkasanBulan extends StatelessWidget {
+  final DateTime sekarang;
+  final RekapBulanan rekap;
+
+  const _RingkasanBulan({required this.sekarang, required this.rekap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Belum diterima · '
+                  '${Format.bulanTahun(sekarang.year, sekarang.month)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: KepalaBiru.teksRedup,
+                  ),
+                ),
+              ),
+              Text(
+                '${rekap.jumlahPesanan} pesanan',
+                key: const Key('ringkasan-bulan-ini'),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Format.rupiah(rekap.sisaTagihan),
+              key: const Key('belum-diterima-bulan-ini'),
+              style: const TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                fontFeatures: AppTheme.angkaRata,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacing12),
+          Row(
+            children: [
+              for (final s in StatusPembayaran.values) ...[
+                if (s != StatusPembayaran.values.first)
+                  const SizedBox(width: AppTheme.spacing8),
+                Expanded(
+                  child: _AngkaStatus(
+                    key: Key('ringkasan-${s.name}'),
+                    status: s,
+                    jumlah: rekap.jumlahPerStatus[s] ?? 0,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// Jumlah pesanan satu status pembayaran di kepala Dashboard.
+class _AngkaStatus extends StatelessWidget {
+  final StatusPembayaran status;
+  final int jumlah;
+
+  const _AngkaStatus({super.key, required this.status, required this.jumlah});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$jumlah',
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              fontFeatures: AppTheme.angkaRata,
+            ),
+          ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              status.label,
+              maxLines: 1,
+              style: const TextStyle(
+                fontSize: 11,
+                color: KepalaBiru.teksRedup,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -490,47 +500,6 @@ class _BarisKiriman extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Kartu jumlah pesanan satu status pembayaran pada bulan berjalan.
-class _KotakStatus extends StatelessWidget {
-  final StatusPembayaran status;
-  final int jumlah;
-
-  const _KotakStatus({super.key, required this.status, required this.jumlah});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: AppTheme.dekorasiKartu,
-      padding: const EdgeInsets.all(AppTheme.spacing12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          KotakIkon.status(status),
-          const SizedBox(height: 10),
-          Text(
-            '$jumlah',
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
-              fontFeatures: AppTheme.angkaRata,
-            ),
-          ),
-          Text(
-            status.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12.5,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-        ],
       ),
     );
   }

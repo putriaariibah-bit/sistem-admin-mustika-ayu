@@ -130,6 +130,7 @@ class _ProfilUsahaScreenState extends State<ProfilUsahaScreen> {
           if (widget.wajib && widget.onKeluar != null)
             TextButton(
               key: const Key('keluar-profil'),
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
               onPressed: widget.onKeluar,
               child: const Text('Keluar'),
             ),

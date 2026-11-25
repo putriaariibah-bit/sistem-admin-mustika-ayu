@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import '../models/pesanan.dart';
 import '../utils/theme.dart';
 import '../widgets/empty_state.dart';
-import '../widgets/pesanan_card.dart';
+import '../widgets/kartu_pesanan_daftar.dart';
+import '../widgets/kepala_biru.dart';
 import '../widgets/tombol_tambah_pesanan.dart';
+import 'detail_pesanan_screen.dart';
+import 'nota_screen.dart';
 
 /// Saringan pada Daftar Pesanan (KF-09).
 enum Saringan {
@@ -66,9 +69,15 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
     return p.rincian.any((r) => r.namaMenu.toLowerCase().contains(kata));
   }
 
+  void _bukaNota(Pesanan p) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => NotaScreen(pesanan: p)),
+      );
+
   @override
   Widget build(BuildContext context) {
     final lebar = AppTheme.layarLebar(context);
+    final tepi = lebar ? AppTheme.spacing24 : AppTheme.marginTepi;
     final kata = _cariController.text.trim().toLowerCase();
     final hariIni = DateTime.now();
     final hasil = [
@@ -83,7 +92,17 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: 'Cari nama pelanggan atau menu',
+        filled: true,
+        fillColor: Colors.white,
         prefixIcon: const Icon(Icons.search, size: 20),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Colors.white, width: 2),
+        ),
         suffixIcon: _cariController.text.isEmpty
             ? null
             : IconButton(
@@ -94,18 +113,22 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
       ),
     );
 
-    final pilihanSaringan = Wrap(
-      spacing: AppTheme.spacing8,
-      runSpacing: AppTheme.spacing8,
-      children: [
-        for (final s in Saringan.values)
-          ChoiceChip(
-            key: Key('saringan-${s.name}'),
-            label: Text(s.label),
-            selected: _saringan == s,
-            onSelected: (_) => setState(() => _saringan = s),
-          ),
-      ],
+    final pilihanSaringan = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final s in Saringan.values) ...[
+            if (s != Saringan.values.first)
+              const SizedBox(width: AppTheme.spacing8),
+            _PilSaringan(
+              key: Key('saringan-${s.name}'),
+              label: s.label,
+              aktif: _saringan == s,
+              onTap: () => setState(() => _saringan = s),
+            ),
+          ],
+        ],
+      ),
     );
 
     Widget isi;
@@ -130,11 +153,14 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
       isi = Column(
         children: [
           for (final p in hasil)
-            PesananCard(
+            KartuPesananDaftar(
               pesanan: p,
-              onTap: widget.onPesananTap == null
+              onDetail: widget.onPesananTap == null
                   ? null
                   : () => widget.onPesananTap!(p),
+              onNota: () => _bukaNota(p),
+              onCatatBayar: () =>
+                  DetailPesananScreen.catatPembayaran(context, p),
             ),
         ],
       );
@@ -142,41 +168,42 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.permukaan,
-      appBar: lebar ? null : AppBar(title: const Text('Daftar Pesanan')),
-      body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.all(
-            lebar ? AppTheme.spacing24 : AppTheme.marginTepi,
+      body: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          KepalaBiru(
+            tepi: tepi,
+            judul: 'Daftar Pesanan',
+            subjudul: 'Semua nota yang sudah dicatat',
+            bawah: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                kolomCari,
+                const SizedBox(height: AppTheme.spacing12),
+                pilihanSaringan,
+              ],
+            ),
           ),
-          children: [
-            if (lebar) ...[
-              Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'Daftar Pesanan',
-                      style: TextStyle(
-                        fontSize: AppTheme.judul,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
-                      ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(tepi, AppTheme.spacing16, tepi, tepi),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (lebar) ...[
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TombolTambahPesanan.ringkas(
+                      key: const Key('tambah-daftar'),
+                      onPressed: widget.onTambah,
                     ),
                   ),
-                  TombolTambahPesanan.ringkas(
-                    key: const Key('tambah-daftar'),
-                    onPressed: widget.onTambah,
-                  ),
+                  const SizedBox(height: AppTheme.spacing12),
                 ],
-              ),
-              const SizedBox(height: AppTheme.spacing16),
-            ],
-            kolomCari,
-            const SizedBox(height: AppTheme.spacing12),
-            pilihanSaringan,
-            const SizedBox(height: AppTheme.spacing12),
-            isi,
-          ],
-        ),
+                isi,
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: lebar
           ? null
@@ -184,6 +211,47 @@ class _DaftarPesananScreenState extends State<DaftarPesananScreen> {
               key: const Key('tambah-daftar'),
               onPressed: widget.onTambah,
             ),
+    );
+  }
+}
+
+/// Tombol saringan berbentuk pil di kepala biru.
+class _PilSaringan extends StatelessWidget {
+  final String label;
+  final bool aktif;
+  final VoidCallback onTap;
+
+  const _PilSaringan({
+    super.key,
+    required this.label,
+    required this.aktif,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      selected: aktif,
+      button: true,
+      child: Material(
+        color: aktif ? Colors.white : Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(999),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: aktif ? AppTheme.primary : AppTheme.primaryMuda,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

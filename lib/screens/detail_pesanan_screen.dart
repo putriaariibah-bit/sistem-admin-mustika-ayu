@@ -52,7 +52,9 @@ class DetailPesananScreen extends StatelessWidget {
       );
   }
 
-  Future<void> _catatPembayaran(BuildContext context, Pesanan p) async {
+  /// Membuka dialog pembayaran lalu menyimpannya (KF-07). Dipakai juga
+  /// oleh tombol Catat Bayar di Daftar Pesanan.
+  static Future<void> catatPembayaran(BuildContext context, Pesanan p) async {
     final bayar = await showDialog<Pembayaran>(
       context: context,
       builder: (context) => _DialogPembayaran(pesanan: p),
@@ -129,7 +131,7 @@ class DetailPesananScreen extends StatelessWidget {
                         _IsiDetail(
                           pesanan: p,
                           onCatatPembayaran: () =>
-                              _catatPembayaran(context, p),
+                              catatPembayaran(context, p),
                           onHapus: () => _hapus(context, p),
                         ),
                       ],

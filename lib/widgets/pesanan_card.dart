@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../models/pesanan.dart';
 import '../utils/format.dart';
 import '../utils/theme.dart';
+import 'kotak_ikon.dart';
 import 'status_badge.dart';
 
 /// Kartu ringkasan satu pesanan pada Dashboard, Daftar Pesanan, dan Rekap.
 ///
-/// Kartu putih: nama dan total di atas, ringkasan menu, lalu keterangan
+/// Kartu putih dengan ikon berwarna status di kiri: nama dan total di atas, ringkasan menu, lalu keterangan
 /// (jenis pesanan atau sisa tagihan) dan tanggal nota di kiri bawah serta
 /// badge status pembayaran di kanan bawah.
 class PesananCard extends StatelessWidget {
@@ -45,8 +46,19 @@ class PesananCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: radius,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-            child: Column(
+            padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                KotakIkon(
+                  ikon: Icons.restaurant,
+                  warna: WarnaStatus.utama(status),
+                  latar: WarnaStatus.latar(status),
+                  ukuran: 42,
+                ),
+                const SizedBox(width: AppTheme.spacing12),
+                Expanded(
+                  child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -121,6 +133,9 @@ class PesananCard extends StatelessWidget {
                     const SizedBox(width: AppTheme.spacing8),
                     StatusBadge(status),
                   ],
+                ),
+              ],
+            ),
                 ),
               ],
             ),

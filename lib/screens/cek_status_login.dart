@@ -80,6 +80,7 @@ class _GerbangProfilState extends State<GerbangProfil> {
               actions: [
                 if (widget.onKeluar != null)
                   TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.white),
                     onPressed: widget.onKeluar,
                     child: const Text('Keluar'),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Tema aplikasi KelolaKatering.
 ///
@@ -166,19 +167,24 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: latar,
       // ── AppBar putih dengan garis bawah (wireframe mobile) ────
+      // Kepala halaman biru dengan sudut bawah melengkung, serasi dengan
+      // KepalaBiru di Dashboard, Daftar Pesanan, dan Rekap.
       appBarTheme: const AppBarTheme(
-        backgroundColor: latar,
-        foregroundColor: textPrimary,
+        backgroundColor: primary,
+        foregroundColor: onPrimary,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        shape: Border(bottom: BorderSide(color: garis)),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        ),
         titleTextStyle: TextStyle(
           fontFamily: fontFamily,
           fontSize: subjudul,
           fontWeight: FontWeight.w700,
-          color: textPrimary,
+          color: onPrimary,
         ),
       ),
       // ── Card putih bergaris tipis ────────────────────────────
